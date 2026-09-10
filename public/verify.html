@@ -1,26 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Elevatifier Credential Verification Portal</title>
-  <meta name="description" content="Official verification registry for Elevatifier internship certificates. Verify authenticity, recipient credentials, and certificate validity.">
-  
+  <meta name="description"
+    content="Official verification registry for Elevatifier internship certificates. Verify authenticity, recipient credentials, and certificate validity.">
+  <meta name="keywords"
+    content="Elevatifier verification, verify certificate, internship credential verification, authenticate certificate, DPIIT recognized">
+  <meta name="theme-color" content="#060913">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://certify.elevatifier.com/verify">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://certify.elevatifier.com/verify">
+  <meta property="og:title" content="Elevatifier Credential Verification Portal">
+  <meta property="og:description"
+    content="Official verification registry for Elevatifier internship certificates. Verify authenticity, recipient credentials, and certificate validity.">
+  <meta property="og:image" content="https://certify.elevatifier.com/Elevatifier-logo.png">
+  <meta property="og:site_name" content="Elevatifier Private Limited">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://certify.elevatifier.com/verify">
+  <meta name="twitter:title" content="Elevatifier Credential Verification Portal">
+  <meta name="twitter:description"
+    content="Official verification registry for Elevatifier internship certificates. Verify authenticity, recipient credentials, and certificate validity.">
+  <meta name="twitter:image" content="https://certify.elevatifier.com/Elevatifier-logo.png">
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/Elevatifier-logo.png">
   <link rel="shortcut icon" type="image/png" href="/Elevatifier-logo.png">
   <link rel="apple-touch-icon" href="/Elevatifier-logo.png">
 
-  <!-- Fonts -->
+  <!-- Fonts (Cinzel, Outfit, Great Vibes, Playfair Display) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Great+Vibes&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap"
+    rel="stylesheet">
+
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
+
   <!-- Styles -->
   <link rel="stylesheet" href="/css/style.css">
+
+  <!-- Structured Data / JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Elevatifier Credential Verification Registry",
+    "url": "https://certify.elevatifier.com/verify",
+    "description": "Public registry for validating authenticated internship credentials issued by Elevatifier Private Limited.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Elevatifier Private Limited",
+      "url": "https://certify.elevatifier.com",
+      "logo": "https://certify.elevatifier.com/Elevatifier-logo.png"
+    }
+  }
+  </script>
   <style>
     .verified-header-badge {
       display: inline-flex;
@@ -36,14 +80,28 @@
       letter-spacing: 0.5px;
       margin-bottom: 12px;
     }
+
     .verified-header-badge i {
       animation: pulseGreen 2s infinite;
     }
+
     @keyframes pulseGreen {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.2); opacity: 0.8; }
-      100% { transform: scale(1); opacity: 1; }
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
+
     .cert-document-showcase {
       background: #fdfdfb;
       padding: 10px;
@@ -53,6 +111,7 @@
       margin: 24px 0;
       position: relative;
     }
+
     #verifyCanvas {
       width: 100%;
       height: auto;
@@ -60,6 +119,7 @@
       display: block;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
+
     @media (max-width: 540px) {
       .cert-document-showcase {
         padding: 5px;
@@ -68,6 +128,7 @@
         margin: 14px 0;
       }
     }
+
     .cert-action-bar {
       display: flex;
       justify-content: space-between;
@@ -76,12 +137,14 @@
       gap: 12px;
       margin-bottom: 12px;
     }
+
     .security-highlights {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 14px;
       margin-top: 24px;
     }
+
     .security-highlight-card {
       background: var(--bg-input);
       border: 1px solid var(--border-subtle);
@@ -93,6 +156,7 @@
       font-size: 13px;
       color: #cbd5e1;
     }
+
     .security-highlight-card i {
       color: #10b981;
       font-size: 18px;
@@ -100,6 +164,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="container">
@@ -121,7 +186,7 @@
     </header>
 
     <div class="verify-container">
-      
+
       <!-- Search Box (Always Available) -->
       <div class="verify-search-card">
         <form id="verifySearchForm" class="search-input-group">
@@ -134,12 +199,14 @@
 
       <!-- Loading State -->
       <div id="verifyLoading" style="display: none; text-align: center; padding: 60px 0;">
-        <i class="fa-solid fa-spinner fa-spin" style="font-size: 36px; color: var(--accent-cyan); margin-bottom: 16px;"></i>
+        <i class="fa-solid fa-spinner fa-spin"
+          style="font-size: 36px; color: var(--accent-cyan); margin-bottom: 16px;"></i>
         <p style="color: var(--text-muted); font-size: 16px;">Querying permanent cryptographic registry...</p>
       </div>
 
       <!-- Not Found / Error State -->
-      <div id="verifyNotFound" style="display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-lg); padding: 40px; text-align: center; margin-bottom: 30px;">
+      <div id="verifyNotFound"
+        style="display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-lg); padding: 40px; text-align: center; margin-bottom: 30px;">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 48px; color: #f87171; margin-bottom: 16px;"></i>
         <h2 style="color: #fff; font-size: 24px; margin-bottom: 8px;">Certificate Not Found</h2>
         <p id="notFoundMessage" style="color: #cbd5e1; max-width: 520px; margin: 0 auto; line-height: 1.5;">
@@ -149,7 +216,7 @@
 
       <!-- Verified Certificate Details Display -->
       <div id="verifyResultCard" style="display: none;" class="glass-card">
-        
+
         <!-- Status Banner -->
         <div class="verification-status-banner">
           <div class="verify-badge-icon">
@@ -161,14 +228,15 @@
             </div>
             <div class="verify-status-title">Official Elevatifier Credential Verified</div>
             <div class="verify-status-desc">
-              This credential has been authenticated against Elevatifier's permanent registry. It is valid, immutable, and recognized for college and corporate requirements.
+              This credential has been authenticated against Elevatifier's permanent registry. It is valid, immutable,
+              and recognized for college and corporate requirements.
             </div>
           </div>
         </div>
 
         <!-- Student & Internship Metadata Grid -->
         <div class="credential-meta-grid">
-          
+
           <div class="credential-item">
             <div class="credential-label"><i class="fa-solid fa-user"></i> Recipient Full Name</div>
             <div class="credential-value" id="resStudentName" style="font-size: 18px; color: #fff;">-</div>
@@ -176,7 +244,8 @@
 
           <div class="credential-item">
             <div class="credential-label"><i class="fa-solid fa-fingerprint"></i> Certificate ID</div>
-            <div class="credential-value highlight-cyan" id="resCertId" style="font-family: monospace; font-size: 17px;">-</div>
+            <div class="credential-value highlight-cyan" id="resCertId"
+              style="font-family: monospace; font-size: 17px;">-</div>
           </div>
 
           <div class="credential-item">
@@ -205,7 +274,8 @@
         <div style="margin-top: 28px;">
           <div class="cert-action-bar">
             <div style="font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-file-image" style="color: var(--text-gold);"></i> Official Certificate Document (300 DPI Print Quality)
+              <i class="fa-solid fa-file-image" style="color: var(--text-gold);"></i> Official Certificate Document (300
+              DPI Print Quality)
             </div>
             <button id="btnDownloadFromVerify" class="btn-download" style="padding: 10px 20px; font-size: 13.5px;">
               <i class="fa-solid fa-cloud-arrow-down"></i> Download Certificate (Image)
@@ -255,77 +325,91 @@
         <i class="fa-solid fa-award"></i> Institutional Verification Standards
       </div>
       <h2 class="section-title">Government & Academic <span>Recognitions</span></h2>
-      <p class="section-subtitle">This credential is authenticated under institutional partnerships and government startup incubations across India</p>
-      
+      <p class="section-subtitle">This credential is authenticated under institutional partnerships and government
+        startup incubations across India</p>
+
       <div class="recognitions-grid" id="recognitionGrid">
         <div class="recognition-badge load-animation">
-          <img src="/images/recognitions/12.png" onerror="this.src='https://services.elevatifier.com/12.png'" alt="DPIIT" class="badge-logo">
+          <img src="/images/recognitions/12.png" onerror="this.src='https://services.elevatifier.com/12.png'"
+            alt="DPIIT" class="badge-logo">
           <h3>DPIIT</h3>
           <p>Department for Promotion of Industry & Internal Trade - Government startup initiative.</p>
         </div>
 
         <div class="recognition-badge load-animation">
-          <img src="/images/recognitions/11.png" onerror="this.src='https://services.elevatifier.com/11.png'" alt="Startup India" class="badge-logo">
+          <img src="/images/recognitions/11.png" onerror="this.src='https://services.elevatifier.com/11.png'"
+            alt="Startup India" class="badge-logo">
           <h3>Startup India</h3>
           <p>Flagship Government of India initiative to catalyse startup culture and build an inclusive ecosystem.</p>
         </div>
 
         <div class="recognition-badge load-animation">
-          <img src="/images/recognitions/10.png" onerror="this.src='https://services.elevatifier.com/10.png'" alt="Start in UP" class="badge-logo">
+          <img src="/images/recognitions/10.png" onerror="this.src='https://services.elevatifier.com/10.png'"
+            alt="Start in UP" class="badge-logo">
           <h3>Start in UP</h3>
-          <p>State-level entrepreneurial/innovation initiative fostering startups and skill development in Uttar Pradesh.</p>
+          <p>State-level entrepreneurial/innovation initiative fostering startups and skill development in Uttar
+            Pradesh.</p>
         </div>
 
         <div class="recognition-badge load-animation">
-          <img src="/images/recognitions/9.png" onerror="this.src='https://services.elevatifier.com/9.png'" alt="Bank of Baroda" class="badge-logo">
+          <img src="/images/recognitions/9.png" onerror="this.src='https://services.elevatifier.com/9.png'"
+            alt="Bank of Baroda" class="badge-logo">
           <h3>Bank of Baroda</h3>
           <p>Leading public sector bank supporting financial inclusion, startups, and youth skilling.</p>
         </div>
 
         <div class="recognition-badge load-animation">
-          <img src="/images/recognitions/8.png" onerror="this.src='https://services.elevatifier.com/8.png'" alt="MoE Innovation Cell" class="badge-logo">
+          <img src="/images/recognitions/8.png" onerror="this.src='https://services.elevatifier.com/8.png'"
+            alt="MoE Innovation Cell" class="badge-logo">
           <h3>MoE Cell</h3>
           <p>Government-backed initiative under Ministry of Education promoting innovation and incubation.</p>
         </div>
 
         <div class="recognition-badge load-animation">
-          <img src="/images/recognitions/7.png" onerror="this.src='https://services.elevatifier.com/7.png'" alt="Innovation Hub Uttar Pradesh" class="badge-logo">
+          <img src="/images/recognitions/7.png" onerror="this.src='https://services.elevatifier.com/7.png'"
+            alt="Innovation Hub Uttar Pradesh" class="badge-logo">
           <h3>Innovation Hub UP</h3>
           <p>State-level incubation hub encouraging entrepreneurship and technical skill development.</p>
         </div>
 
         <div class="recognition-badge load-animation">
-          <img src="/images/recognitions/6.png" onerror="this.src='https://services.elevatifier.com/6.png'" alt="AKTU Innovation Cell" class="badge-logo">
+          <img src="/images/recognitions/6.png" onerror="this.src='https://services.elevatifier.com/6.png'"
+            alt="AKTU Innovation Cell" class="badge-logo">
           <h3>AKTU Innovation Cell</h3>
           <p>Partner technical university associated with academic curriculum and engineering skill training.</p>
         </div>
 
         <div class="recognition-badge load-animation">
-          <img src="/images/recognitions/5.png" onerror="this.src='https://services.elevatifier.com/5.png'" alt="KNIT Sultanpur" class="badge-logo">
+          <img src="/images/recognitions/5.png" onerror="this.src='https://services.elevatifier.com/5.png'"
+            alt="KNIT Sultanpur" class="badge-logo">
           <h3>KNIT Sultanpur</h3>
           <p>Premier government engineering institution associated with academic and technical support.</p>
         </div>
 
         <div class="recognition-badge load-animation">
-          <img src="/images/recognitions/4.png" onerror="this.src='https://services.elevatifier.com/4.png'" alt="EO GSEA" class="badge-logo">
+          <img src="/images/recognitions/4.png" onerror="this.src='https://services.elevatifier.com/4.png'"
+            alt="EO GSEA" class="badge-logo">
           <h3>EO GSEA</h3>
           <p>Global Student Entrepreneur Awards competition recognizing student innovation.</p>
         </div>
 
         <div class="recognition-badge load-animation">
-          <img src="/images/recognitions/3.png" onerror="this.src='https://services.elevatifier.com/3.png'" alt="Wadhwani Foundation" class="badge-logo">
+          <img src="/images/recognitions/3.png" onerror="this.src='https://services.elevatifier.com/3.png'"
+            alt="Wadhwani Foundation" class="badge-logo">
           <h3>Wadhwani Foundation</h3>
           <p>Global foundation accelerating job growth, promoting entrepreneurship, and skilling.</p>
         </div>
 
         <div class="recognition-badge load-animation">
-          <img src="/images/recognitions/2.png" onerror="this.src='https://services.elevatifier.com/2.png'" alt="Classplus" class="badge-logo">
+          <img src="/images/recognitions/2.png" onerror="this.src='https://services.elevatifier.com/2.png'"
+            alt="Classplus" class="badge-logo">
           <h3>Classplus</h3>
           <p>Ed-tech platform providing digital infrastructure for educators and online learning communities.</p>
         </div>
 
         <div class="recognition-badge load-animation">
-          <img src="/images/recognitions/1.png" onerror="this.src='https://services.elevatifier.com/1.png'" alt="Startup Foundation" class="badge-logo">
+          <img src="/images/recognitions/1.png" onerror="this.src='https://services.elevatifier.com/1.png'"
+            alt="Startup Foundation" class="badge-logo">
           <h3>Startup Foundation</h3>
           <p>Mentorship network providing vital acceleration resources to student-led technical ventures.</p>
         </div>
@@ -341,10 +425,11 @@
         <div class="footer-brand">
           <div class="footer-logo-row">
             <img src="/Elevatifier-logo.png" alt="Elevatifier Logo">
-            <h3>Elevatifier Technologies</h3>
+            <h3>Elevatifier Private Limited</h3>
           </div>
           <p>
-            Elevatifier is an ISO 9001:2015 certified ed-tech & innovation platform recognized by DPIIT and Startup India. Empowering students with industry-standard internships and tamper-proof digital credentials.
+            Elevatifier is an ISO 9001:2015 certified ed-tech & innovation platform recognized by DPIIT and Startup
+            India. Empowering students with industry-standard internships and tamper-proof digital credentials.
           </p>
           <div class="footer-accreditations">
             <span class="footer-badge"><i class="fa-solid fa-shield-check"></i> DPIIT Recognized</span>
@@ -356,30 +441,36 @@
         <div class="footer-col">
           <h4><i class="fa-solid fa-compass" style="color: var(--accent-cyan);"></i> Navigation</h4>
           <ul class="footer-links">
-            <li><a href="/"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> Issue Certificate</a></li>
-            <li><a href="/verify"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> Verify Credential</a></li>
-            <li><a href="/#recognitions"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> Partner Recognitions</a></li>
-            <li><a href="/#howItWorks"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> How It Works</a></li>
-            <li><a href="/#faqSection"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> Help & FAQs</a></li>
+            <li><a href="/"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> Issue Certificate</a>
+            </li>
+            <li><a href="/verify"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> Verify
+                Credential</a></li>
+            <li><a href="/#recognitions"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> Partner
+                Recognitions</a></li>
+            <li><a href="/#howItWorks"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> How It
+                Works</a></li>
+            <li><a href="/#faqSection"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> Help &
+                FAQs</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
           <h4><i class="fa-solid fa-layer-group" style="color: var(--text-gold);"></i> Tech Domains</h4>
           <ul class="footer-links">
-            <li><a href="/#certificateForm"><i class="fa-solid fa-code" style="font-size: 10px;"></i> Full Stack Web Dev</a></li>
-            <li><a href="/#certificateForm"><i class="fa-solid fa-brain" style="font-size: 10px;"></i> AI & Machine Learning</a></li>
-            <li><a href="/#certificateForm"><i class="fa-solid fa-chart-pie" style="font-size: 10px;"></i> Data Science Analytics</a></li>
-            <li><a href="/#certificateForm"><i class="fa-solid fa-shield-halved" style="font-size: 10px;"></i> Cyber Security</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-code" style="font-size: 10px;"></i> Frontend & Backend Dev</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-database" style="font-size: 10px;"></i> Database Engineering</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-palette" style="font-size: 10px;"></i> Graphic & UI/UX Design</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-bullhorn" style="font-size: 10px;"></i> Digital Marketing</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-brain" style="font-size: 10px;"></i> AI & Data Science</a></li>
             <li><a href="/#certificateForm"><i class="fa-solid fa-cloud" style="font-size: 10px;"></i> Cloud & DevOps</a></li>
-            <li><a href="/#certificateForm"><i class="fa-brands fa-android" style="font-size: 10px;"></i> Android App Dev</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
           <h4><i class="fa-solid fa-headset" style="color: #34d399;"></i> Official Helpdesk</h4>
           <div class="footer-help-box">
-            <a href="mailto:contact@elevatifier.com" class="help-email"><i class="fa-solid fa-envelope"></i> contact@elevatifier.com</a>
+            <a href="mailto:contact@elevatifier.com" class="help-email"><i class="fa-solid fa-envelope"></i>
+              contact@elevatifier.com</a>
             <div class="help-note">24x7 Priority Support for Student Credentials & College Verification Enquiries.</div>
           </div>
           <div style="margin-top: 14px; font-size: 12px; color: var(--text-muted); line-height: 1.5;">
@@ -391,7 +482,7 @@
 
       <div class="footer-bottom">
         <div>
-          &copy; 2026 Elevatifier Technologies & Edutech Pvt. Ltd. All rights reserved.
+          &copy; 2026 Elevatifier Private Limited. All rights reserved.
         </div>
         <div class="footer-security-seals">
           <span><i class="fa-solid fa-lock"></i> 256-Bit SSL Encrypted</span>
@@ -413,4 +504,5 @@
   <script src="/js/verify.js"></script>
 
 </body>
+
 </html>

@@ -10,6 +10,8 @@ const apiRoutes = require('./routes/api');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.disable('x-powered-by');
+
 // Configure Helmet with relaxed CSP for Razorpay, Google Fonts, and dynamic canvas
 app.use(
   helmet({

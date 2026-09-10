@@ -1,0 +1,11 @@
+# Elevatifier Official Internship Certificate Portal
+# Website: https://certify.elevatifier.com
+
+User-agent: *
+Allow: /
+Allow: /verify
+Allow: /verify/*
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://certify.elevatifier.com/sitemap.xml

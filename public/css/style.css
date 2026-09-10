@@ -88,18 +88,26 @@ body::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 0;
+  padding: 18px 0;
   border-bottom: 1px solid var(--border-subtle);
   margin-bottom: 36px;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  position: relative;
+  z-index: 50;
+  transition: all 0.3s ease;
 }
 
 .brand-logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   text-decoration: none;
   color: #fff;
+  transition: transform 0.2s ease;
+}
+
+.brand-logo:hover {
+  transform: scale(1.01);
 }
 
 .brand-logo-img {
@@ -107,7 +115,8 @@ body::before {
   max-height: 42px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.45));
+  transition: filter 0.2s ease;
 }
 
 .brand-text h1 {
@@ -117,6 +126,7 @@ body::before {
   display: flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
 }
 
 .brand-tag {
@@ -124,52 +134,63 @@ body::before {
   background: rgba(56, 189, 248, 0.15);
   color: var(--accent-cyan);
   border: 1px solid rgba(56, 189, 248, 0.3);
-  padding: 2px 8px;
+  padding: 3px 9px;
   border-radius: 20px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .support-pill-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   color: var(--text-muted);
   text-decoration: none;
   font-size: 13px;
-  transition: color 0.2s ease;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  padding: 8px 16px;
+  border-radius: 30px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .support-pill-link:hover {
   color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
+  transform: translateY(-1px);
 }
-
 
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
 }
 
 .nav-link {
   color: var(--text-muted);
   text-decoration: none;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   gap: 6px;
+  padding: 8px 14px;
+  border-radius: 30px;
 }
 
 .nav-link:hover, .nav-link.active {
   color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.08);
 }
 
 .btn-nav-verify {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(56, 189, 248, 0.25);
   color: #fff;
   padding: 8px 18px;
   border-radius: 30px;
@@ -178,16 +199,104 @@ body::before {
   cursor: pointer;
   transition: all 0.2s;
   text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
 }
 
 .btn-nav-verify:hover {
-  background: rgba(56, 189, 248, 0.15);
+  background: rgba(56, 189, 248, 0.18);
   border-color: var(--accent-cyan);
   color: var(--accent-cyan);
   transform: translateY(-1px);
+  box-shadow: 0 4px 15px -3px rgba(56, 189, 248, 0.25);
+}
+
+/* Navbar Responsive Breakpoints */
+@media (max-width: 860px) {
+  .navbar {
+    padding: 16px 0;
+    margin-bottom: 28px;
+  }
+  .brand-text h1 {
+    font-size: 18px;
+  }
+  .nav-links {
+    gap: 10px;
+  }
+  .support-pill-link, .btn-nav-verify {
+    padding: 7px 14px;
+    font-size: 12.5px;
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0 16px 0;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .brand-logo {
+    justify-content: center;
+  }
+  .brand-logo-img {
+    height: 36px;
+  }
+  .brand-text h1 {
+    font-size: 17px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+  }
+  .nav-links {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .support-pill-link, .btn-nav-verify, .nav-link {
+    flex: 1 1 auto;
+    justify-content: center;
+    text-align: center;
+    min-width: 140px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .navbar {
+    gap: 12px;
+    padding: 12px 0 14px 0;
+  }
+  .brand-logo-img {
+    height: 32px;
+  }
+  .brand-text h1 {
+    font-size: 15.5px;
+  }
+  .brand-tag {
+    font-size: 9.5px;
+    padding: 2px 7px;
+  }
+  .nav-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+  .support-pill-link, .btn-nav-verify, .nav-link {
+    min-width: 0;
+    width: 100%;
+    padding: 8px 6px;
+    font-size: 11.5px;
+    gap: 5px;
+  }
 }
 
 /* ==========================================================================
@@ -1786,8 +1895,8 @@ select.form-control option {
    Rich Corporate Multi-Column Footer
    ========================================================================== */
 .site-footer {
-  border-top: 1px solid var(--border-subtle);
-  background: rgba(11, 19, 41, 0.85);
+  border-top: 1px solid rgba(212, 175, 55, 0.25);
+  background: rgba(11, 19, 41, 0.90);
   backdrop-filter: blur(16px);
   margin-top: 80px;
   padding: 60px 0 28px 0;
@@ -1795,25 +1904,21 @@ select.form-control option {
   z-index: 10;
 }
 
+.site-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.4) 25%, rgba(212, 175, 55, 0.6) 50%, rgba(56, 189, 248, 0.4) 75%, transparent 100%);
+}
+
 .footer-grid {
   display: grid;
-  grid-template-columns: 2.2fr 1.2fr 1.3fr 1.5fr;
+  grid-template-columns: 2.2fr 1.1fr 1.2fr 1.5fr;
   gap: 40px;
   margin-bottom: 45px;
-}
-
-@media (max-width: 1024px) {
-  .footer-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-  }
-}
-
-@media (max-width: 640px) {
-  .footer-grid {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
 }
 
 .footer-brand {
@@ -1864,6 +1969,12 @@ select.form-control option {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.footer-badge:hover {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: var(--accent-cyan);
 }
 
 .footer-col h4 {
@@ -1917,6 +2028,11 @@ select.form-control option {
   text-decoration: none;
   display: block;
   margin-bottom: 4px;
+  transition: color 0.2s;
+}
+
+.footer-help-box .help-email:hover {
+  color: #fff;
 }
 
 .footer-help-box .help-note {
@@ -1957,6 +2073,7 @@ select.form-control option {
   align-items: center;
   gap: 14px;
   font-size: 11.5px;
+  flex-wrap: wrap;
 }
 
 .footer-security-seals span {
@@ -1964,4 +2081,88 @@ select.form-control option {
   align-items: center;
   gap: 5px;
   color: #10b981;
+}
+
+/* Footer Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .site-footer {
+    padding: 48px 0 24px 0;
+    margin-top: 60px;
+  }
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 36px;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-footer {
+    padding: 38px 0 20px 0;
+    margin-top: 48px;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .footer-brand {
+    text-align: center;
+    align-items: center;
+  }
+  .footer-logo-row {
+    justify-content: center;
+  }
+  .footer-accreditations {
+    justify-content: center;
+  }
+  .footer-col {
+    text-align: center;
+  }
+  .footer-col h4 {
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .footer-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 14px;
+    text-align: left;
+  }
+  .footer-links a {
+    justify-content: flex-start;
+  }
+  .footer-help-box {
+    text-align: center;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 14px;
+  }
+  .footer-security-seals {
+    justify-content: center;
+    gap: 10px 16px;
+  }
+  .footer-bottom-links {
+    justify-content: center;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .footer-links {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .footer-links a {
+    justify-content: center;
+  }
+  .footer-security-seals {
+    flex-direction: column;
+    gap: 6px;
+    font-size: 11px;
+  }
+  .footer-bottom-links {
+    flex-direction: column;
+    gap: 8px;
+  }
 }

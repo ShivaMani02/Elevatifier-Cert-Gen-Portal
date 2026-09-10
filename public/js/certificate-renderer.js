@@ -1,360 +1,612 @@
-/**
- * Elevatifier Luxury Executive Certificate 2D Canvas Engine
- * Renders high-fidelity, gallery-ready 300 DPI A4 Landscape Certificates (3000 x 2121 px)
- * Designed for Elevatifier Technologies Pvt. Ltd. (Founder: Shivansh Vasu)
- * Base Verification Registry: https://certify.elevatifier.com
- */
 
 window.CertificateRenderer = {
-  WIDTH: 3000,
-  HEIGHT: 2121,
+  WIDTH: 2480,
+  HEIGHT: 1754,
+
+  // ─── Refined Luxury Palette ─────────────────────────────
+  COLORS: {
+    navy: '#081426', // Deep Royal Navy (higher contrast & prestige)
+    navyLight: '#162a45',
+    navySlate: '#1e3a5f',
+    gold: '#c5993a', // Classic Polished Gold
+    goldLight: '#e8c96a',
+    goldBright: '#f5dc88',
+    goldDark: '#8a6914',
+    goldPale: '#faf6eb',
+    white: '#ffffff',
+    offWhite: '#fafaf7',
+    creamCard: '#fdfcf9',
+    textDark: '#081426',
+    textBody: '#1e293b',
+    textSlate: '#334155',
+    textMuted: '#475569',
+    borderGold: 'rgba(197, 153, 58, 0.50)',
+    borderSubtle: 'rgba(8, 20, 38, 0.08)',
+    greenBadge: '#059669',
+  },
 
   /**
-   * Render the complete luxury certificate onto an HTML5 Canvas element
-   * @param {HTMLCanvasElement} canvas 
-   * @param {Object} cert 
-   * @returns {Promise<void>}
+   * Main render pipeline
    */
   async render(canvas, cert) {
     if (document.fonts && document.fonts.ready) {
-      try {
-        await document.fonts.ready;
-      } catch (e) {
-        console.warn('Font loading check completed with warning:', e);
+      try { await document.fonts.ready; } catch (e) {
+        console.warn('Font preload warning:', e);
       }
     }
+
     canvas.width = this.WIDTH;
     canvas.height = this.HEIGHT;
     const ctx = canvas.getContext('2d');
 
-    // 1. Luxury Ivory-Pearl Radial Gradient Background with Soft Vignette
+    // Pipeline: Background → Borders & Flanks → Header → Body → Recognitions → Footer
     this.drawBackground(ctx);
-
-    // 2. High-Precision Banknote Security Guilloche Pattern & Watermark
-    this.drawSecurityGuilloche(ctx);
-
-    // 3. Multi-Layered Royal Navy & Metallic Gold Ornamental Borders & Filigrees
-    this.drawOrnamentalBorders(ctx);
-
-    // 4. Header & Official Elevatifier Logo & Accreditation Titles
+    this.drawBorders(ctx);
+    this.drawFlankDecorativeElements(ctx);
     await this.drawHeader(ctx);
-
-    // 5. Candidate Name, Academic Affiliation, Duration Pill & Domain Citations
-    this.drawContent(ctx, cert);
-
-    // 6. Authorized Signatures, Embossed 3D Gold Seal, Dynamic QR & Recognitions Strip
-    await this.drawFooterAndSecurity(ctx, cert);
+    this.drawBodyContent(ctx, cert);
+    await this.drawRecognitionStrip(ctx);
+    await this.drawFooterSection(ctx, cert);
   },
 
-  /**
-   * Draw luxury ivory parchment gradient background with corner vignette
-   */
+
+  // ═══════════════════════════════════════════════════════
+  //  1. BACKGROUND — Pure White with Micro Security Texture
+  // ═══════════════════════════════════════════════════════
+
   drawBackground(ctx) {
-    const centerX = this.WIDTH / 2;
-    const centerY = this.HEIGHT / 2;
+    const W = this.WIDTH, H = this.HEIGHT;
+    const cx = W / 2, cy = H / 2;
 
-    // Luxurious radial ivory-pearl gradient with soft perimeter vignette
-    const bgGradient = ctx.createRadialGradient(centerX, centerY, 200, centerX, centerY, 1750);
-    bgGradient.addColorStop(0, '#ffffff');
-    bgGradient.addColorStop(0.3, '#fdfcf8');
-    bgGradient.addColorStop(0.65, '#f8f4e7');
-    bgGradient.addColorStop(0.85, '#f1ebda');
-    bgGradient.addColorStop(1, '#e7dfc7');
+    // Pure crisp white base
+    ctx.fillStyle = this.COLORS.white;
+    ctx.fillRect(0, 0, W, H);
 
-    ctx.fillStyle = bgGradient;
-    ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
-  },
+    // Warm radial glow in center for depth
+    const warmGlow = ctx.createRadialGradient(cx, cy, 120, cx, cy, 1180);
+    warmGlow.addColorStop(0, 'rgba(255, 252, 245, 0.45)');
+    warmGlow.addColorStop(0.6, 'rgba(255, 254, 250, 0.18)');
+    warmGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = warmGlow;
+    ctx.fillRect(0, 0, W, H);
 
-  /**
-   * Draw bank-grade guilloche micro-wave watermark & brand security imprint
-   */
-  drawSecurityGuilloche(ctx) {
+    // Faint security watermark in center
     ctx.save();
-    const centerX = this.WIDTH / 2;
-    const centerY = this.HEIGHT / 2 + 30;
-
-    // 1. Primary Mathematical Guilloche Rosette Curves (24-Lobe Epicycloid)
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.048)';
-    ctx.lineWidth = 1.3;
-
-    for (let r = 140; r <= 880; r += 32) {
-      ctx.beginPath();
-      for (let theta = 0; theta < Math.PI * 2; theta += 0.015) {
-        const radius = r + 14 * Math.sin(theta * 16) * Math.cos(theta * 8);
-        const x = centerX + radius * Math.cos(theta);
-        const y = centerY + radius * Math.sin(theta);
-        if (theta === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.stroke();
-    }
-
-    // 2. Secondary Harmonic Micro-Curves (Midnight Navy Accent)
-    ctx.strokeStyle = 'rgba(6, 14, 28, 0.022)';
-    ctx.lineWidth = 1;
-    for (let r = 180; r <= 820; r += 44) {
-      ctx.beginPath();
-      for (let theta = 0; theta < Math.PI * 2; theta += 0.02) {
-        const radius = r + 11 * Math.cos(theta * 24);
-        const x = centerX + radius * Math.cos(theta);
-        const y = centerY + radius * Math.sin(theta);
-        if (theta === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.stroke();
-    }
-
-    // 3. Banknote Continuous Sine-Wave Security Grid across entire certificate
-    ctx.strokeStyle = 'rgba(6, 14, 28, 0.014)';
-    ctx.lineWidth = 0.9;
-    for (let y = 140; y < this.HEIGHT - 140; y += 36) {
-      ctx.beginPath();
-      for (let x = 120; x < this.WIDTH - 120; x += 22) {
-        const yOffset = Math.sin((x + y) * 0.013) * 7;
-        if (x === 120) ctx.moveTo(x, y + yOffset);
-        else ctx.lineTo(x, y + yOffset);
-      }
-      ctx.stroke();
-    }
-
-    // 4. Center Brand Security Watermark
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = '900 150px "Cinzel", "Times New Roman", serif';
-    ctx.fillStyle = 'rgba(6, 14, 28, 0.024)';
-    ctx.letterSpacing = '14px';
-    ctx.fillText('ELEVATIFIER', centerX, centerY - 15);
+    ctx.font = '900 132px "Cinzel", serif';
+    ctx.fillStyle = 'rgba(8, 20, 38, 0.015)';
+    ctx.fillText('ELEVATIFIER', cx, cy - 25);
+    ctx.font = '700 34px "Outfit", sans-serif';
+    ctx.letterSpacing = '8px';
+    ctx.fillStyle = 'rgba(197, 153, 58, 0.025)';
+    ctx.fillText('AUTHENTICATED CREDENTIAL', cx, cy + 60);
+    ctx.restore();
 
+    // Subtle security concentric arcs
+    ctx.save();
+    ctx.strokeStyle = 'rgba(197, 153, 58, 0.020)';
+    ctx.lineWidth = 0.8;
+    for (let r = 240; r <= 880; r += 60) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
     ctx.restore();
   },
 
-  /**
-   * Draw Multi-Layered Royal Navy and Metallic Gold Borders with Corner & Midpoint Filigrees
-   */
-  drawOrnamentalBorders(ctx) {
-    ctx.save();
-    const margin = 64;
-    const innerMargin = 88;
-    const coreMargin = 104;
-    const hairlineMargin = 112;
 
-    // 1. Outer Deep Royal Navy Border
-    ctx.strokeStyle = '#060d1b';
-    ctx.lineWidth = 14;
-    ctx.strokeRect(margin, margin, this.WIDTH - margin * 2, this.HEIGHT - margin * 2);
+  // ═══════════════════════════════════════════════════════
+  //  2. BORDERS — Master Diploma Ornate Security Frame
+  // ═══════════════════════════════════════════════════════
 
-    // 2. Metallic Gold Accent Frame with Lustrous Multi-Stop Gradient
-    const goldGrad = ctx.createLinearGradient(margin, margin, this.WIDTH - margin, this.HEIGHT - margin);
-    goldGrad.addColorStop(0, '#966e0a');
-    goldGrad.addColorStop(0.18, '#f7df8d');
-    goldGrad.addColorStop(0.38, '#d4af37');
-    goldGrad.addColorStop(0.58, '#fff9d6');
-    goldGrad.addColorStop(0.8, '#c69214');
-    goldGrad.addColorStop(1, '#805c03');
+  drawBorders(ctx) {
+    const W = this.WIDTH, H = this.HEIGHT;
+    const C = this.COLORS;
 
+    // Tier 1: Outermost Deep Navy Frame (8px)
+    ctx.strokeStyle = C.navy;
+    ctx.lineWidth = 8;
+    ctx.strokeRect(34, 34, W - 68, H - 68);
+
+    // Tier 2: Ornate Running Gold Dentil & Diamond Chain (between 44px and 52px)
+    this._drawRunningDentilBorder(ctx);
+
+    // Tier 3: Rich Gold Gradient Outer Frame (3.5px at 56px)
+    const goldGrad = ctx.createLinearGradient(56, 56, W - 56, H - 56);
+    goldGrad.addColorStop(0, '#8a6914');
+    goldGrad.addColorStop(0.18, '#e8c96a');
+    goldGrad.addColorStop(0.48, '#c5993a');
+    goldGrad.addColorStop(0.82, '#f0d88a');
+    goldGrad.addColorStop(1, '#8a6914');
     ctx.strokeStyle = goldGrad;
-    ctx.lineWidth = 4.5;
-    ctx.strokeRect(innerMargin, innerMargin, this.WIDTH - innerMargin * 2, this.HEIGHT - innerMargin * 2);
+    ctx.lineWidth = 3.5;
+    ctx.strokeRect(56, 56, W - 112, H - 112);
 
-    // 3. Inner Fine Pinstripe Navy Frame
-    ctx.strokeStyle = '#060d1b';
-    ctx.lineWidth = 1.8;
-    ctx.strokeRect(coreMargin, coreMargin, this.WIDTH - coreMargin * 2, this.HEIGHT - coreMargin * 2);
+    // Tier 4: Navy Pinstripe Frame (1.6px at 66px)
+    ctx.strokeStyle = C.navy;
+    ctx.lineWidth = 1.6;
+    ctx.strokeRect(66, 66, W - 132, H - 132);
 
-    // 4. Inner Hairline Gold Frame
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.45)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(hairlineMargin, hairlineMargin, this.WIDTH - hairlineMargin * 2, this.HEIGHT - hairlineMargin * 2);
+    // Tier 5: Inner Gold Hairline Frame (0.8px at 72px)
+    ctx.strokeStyle = C.borderGold;
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(72, 72, W - 144, H - 144);
 
-    // 5. Ornate Corner Filigrees
-    this.drawCornerFiligree(ctx, margin + 24, margin + 24, 0);
-    this.drawCornerFiligree(ctx, this.WIDTH - margin - 24, margin + 24, Math.PI / 2);
-    this.drawCornerFiligree(ctx, this.WIDTH - margin - 24, this.HEIGHT - margin - 24, Math.PI);
-    this.drawCornerFiligree(ctx, margin + 24, this.HEIGHT - margin - 24, -Math.PI / 2);
+    // Tier 6: Elaborate Guilloché & Filigree Corner Ornaments
+    this._drawOrnateCornerFlourishes(ctx);
 
-    // 6. Mid-Edge Diamond Flourishes
-    this.drawEdgeCrest(ctx, this.WIDTH / 2, margin + 24, 0);
-    this.drawEdgeCrest(ctx, this.WIDTH / 2, this.HEIGHT - margin - 24, Math.PI);
-    this.drawEdgeCrest(ctx, margin + 24, this.HEIGHT / 2, -Math.PI / 2);
-    this.drawEdgeCrest(ctx, this.WIDTH - margin - 24, this.HEIGHT / 2, Math.PI / 2);
-
-    ctx.restore();
+    // Tier 7: Mid-edge Ornate Diamond Clusters
+    this._drawMidEdgeMedallions(ctx);
   },
 
   /**
-   * Draw ornate corner filigree rosette with nested gold diamonds
+   * Continuous repeating ornate gold diamond dentil chain along all 4 edges
    */
-  drawCornerFiligree(ctx, x, y, rotation) {
+  _drawRunningDentilBorder(ctx) {
+    const W = this.WIDTH, H = this.HEIGHT;
+    const C = this.COLORS;
+    const yTop = 45;
+    const yBot = H - 45;
+    const xLeft = 45;
+    const xRight = W - 45;
+    const step = 20;
+
     ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rotation);
+    ctx.fillStyle = C.gold;
 
-    ctx.strokeStyle = '#d4af37';
-    ctx.fillStyle = '#060d1b';
-    ctx.lineWidth = 2.5;
+    // Top & Bottom running diamond chains
+    for (let x = 80; x <= W - 80; x += step) {
+      // Top diamond
+      ctx.beginPath();
+      ctx.moveTo(x, yTop - 3.5);
+      ctx.lineTo(x + 3.5, yTop);
+      ctx.lineTo(x, yTop + 3.5);
+      ctx.lineTo(x - 3.5, yTop);
+      ctx.closePath();
+      ctx.fill();
 
-    // Corner nested squares
-    ctx.strokeRect(0, 0, 56, 56);
-    ctx.fillRect(8, 8, 40, 40);
+      // Top micro-dot
+      if (x + step / 2 <= W - 80) {
+        ctx.beginPath();
+        ctx.arc(x + step / 2, yTop, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
-    // Inner 24k gold diamond
-    ctx.fillStyle = '#fced9e';
-    ctx.beginPath();
-    ctx.moveTo(28, 14);
-    ctx.lineTo(42, 28);
-    ctx.lineTo(28, 42);
-    ctx.lineTo(14, 28);
-    ctx.closePath();
-    ctx.fill();
+      // Bottom diamond
+      ctx.beginPath();
+      ctx.moveTo(x, yBot - 3.5);
+      ctx.lineTo(x + 3.5, yBot);
+      ctx.lineTo(x, yBot + 3.5);
+      ctx.lineTo(x - 3.5, yBot);
+      ctx.closePath();
+      ctx.fill();
 
-    // Corner brackets extending outward
-    ctx.strokeStyle = '#d4af37';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(76, 4);
-    ctx.lineTo(4, 4);
-    ctx.lineTo(4, 76);
-    ctx.stroke();
+      // Bottom micro-dot
+      if (x + step / 2 <= W - 80) {
+        ctx.beginPath();
+        ctx.arc(x + step / 2, yBot, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
 
-    // Extended botanical scroll flourish line
-    ctx.beginPath();
-    ctx.moveTo(88, 4);
-    ctx.lineTo(76, 4);
-    ctx.moveTo(4, 76);
-    ctx.lineTo(4, 88);
-    ctx.stroke();
+    // Left & Right running diamond chains
+    for (let y = 80; y <= H - 80; y += step) {
+      // Left diamond
+      ctx.beginPath();
+      ctx.moveTo(xLeft - 3.5, y);
+      ctx.lineTo(xLeft, y - 3.5);
+      ctx.lineTo(xLeft + 3.5, y);
+      ctx.lineTo(xLeft, y + 3.5);
+      ctx.closePath();
+      ctx.fill();
 
-    // Center tiny gold diamond accent
-    ctx.fillStyle = '#d4af37';
-    ctx.beginPath();
-    ctx.moveTo(28, 24);
-    ctx.lineTo(32, 28);
-    ctx.lineTo(28, 32);
-    ctx.lineTo(24, 28);
-    ctx.closePath();
-    ctx.fill();
+      // Left micro-dot
+      if (y + step / 2 <= H - 80) {
+        ctx.beginPath();
+        ctx.arc(xLeft, y + step / 2, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Right diamond
+      ctx.beginPath();
+      ctx.moveTo(xRight - 3.5, y);
+      ctx.lineTo(xRight, y - 3.5);
+      ctx.lineTo(xRight + 3.5, y);
+      ctx.lineTo(xRight, y + 3.5);
+      ctx.closePath();
+      ctx.fill();
+
+      // Right micro-dot
+      if (y + step / 2 <= H - 80) {
+        ctx.beginPath();
+        ctx.arc(xRight, y + step / 2, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
 
     ctx.restore();
   },
 
   /**
-   * Draw mid-edge diamond crest on border
+   * Ornate diploma corner filigree: concentric arcs + multi-tier brackets + 8-point stars
    */
-  drawEdgeCrest(ctx, x, y, rotation) {
+  _drawOrnateCornerFlourishes(ctx) {
+    const W = this.WIDTH, H = this.HEIGHT;
+    const C = this.COLORS;
+    const m = 50;
+    const armLen = 85;
+
+    const corners = [
+      { x: m, y: m, dx: 1, dy: 1, startAngle: 0, endAngle: Math.PI / 2 },
+      { x: W - m, y: m, dx: -1, dy: 1, startAngle: Math.PI / 2, endAngle: Math.PI },
+      { x: W - m, y: H - m, dx: -1, dy: -1, startAngle: Math.PI, endAngle: 3 * Math.PI / 2 },
+      { x: m, y: H - m, dx: 1, dy: -1, startAngle: 3 * Math.PI / 2, endAngle: Math.PI * 2 },
+    ];
+
     ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rotation);
+    corners.forEach(c => {
+      // Concentric security guilloché quarter-arcs
+      ctx.strokeStyle = 'rgba(197, 153, 58, 0.35)';
+      ctx.lineWidth = 1;
+      [22, 34, 46, 58].forEach(r => {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, r, c.startAngle, c.endAngle);
+        ctx.stroke();
+      });
 
-    ctx.fillStyle = '#d4af37';
-    ctx.beginPath();
-    ctx.moveTo(0, -10);
-    ctx.lineTo(10, 0);
-    ctx.lineTo(0, 10);
-    ctx.lineTo(-10, 0);
-    ctx.closePath();
-    ctx.fill();
+      // Outer gold L-bracket
+      ctx.strokeStyle = C.gold;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(c.x + c.dx * armLen, c.y);
+      ctx.lineTo(c.x, c.y);
+      ctx.lineTo(c.x, c.y + c.dy * armLen);
+      ctx.stroke();
 
-    ctx.strokeStyle = '#060d1b';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(-24, 0);
-    ctx.lineTo(-12, 0);
-    ctx.moveTo(12, 0);
-    ctx.lineTo(24, 0);
-    ctx.stroke();
+      // Inner gold L-bracket
+      const inOff = 12;
+      ctx.strokeStyle = C.goldLight;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(c.x + c.dx * (armLen - 10), c.y + c.dy * inOff);
+      ctx.lineTo(c.x + c.dx * inOff, c.y + c.dy * inOff);
+      ctx.lineTo(c.x + c.dx * inOff, c.y + c.dy * (armLen - 10));
+      ctx.stroke();
 
+      // 8-Point Gold Star Rosette at corner vertex
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.fillStyle = C.gold;
+      const numPts = 8;
+      const outerR = 9;
+      const innerR = 4;
+      ctx.beginPath();
+      for (let i = 0; i < numPts * 2; i++) {
+        const r = i % 2 === 0 ? outerR : innerR;
+        const angle = (i * Math.PI) / numPts;
+        const px = Math.cos(angle) * r;
+        const py = Math.sin(angle) * r;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // End finials on bracket arms
+      [
+        { fx: c.x + c.dx * armLen, fy: c.y },
+        { fx: c.x, fy: c.y + c.dy * armLen },
+      ].forEach(f => {
+        ctx.fillStyle = C.gold;
+        ctx.beginPath();
+        ctx.arc(f.fx, f.fy, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    });
     ctx.restore();
   },
 
   /**
-   * Draw Official Elevatifier Logo & Header Typography
+   * Mid-edge ornate diamond crests at Top, Bottom, Left, and Right centers
    */
+  _drawMidEdgeMedallions(ctx) {
+    const W = this.WIDTH, H = this.HEIGHT;
+    const cx = W / 2, cy = H / 2;
+    const C = this.COLORS;
+
+    const positions = [
+      { x: cx, y: 56, isHoriz: true },
+      { x: cx, y: H - 56, isHoriz: true },
+      { x: 56, y: cy, isHoriz: false },
+      { x: W - 56, y: cy, isHoriz: false },
+    ];
+
+    ctx.save();
+    ctx.fillStyle = C.gold;
+
+    positions.forEach(p => {
+      // Center primary diamond
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y - 8);
+      ctx.lineTo(p.x + 8, p.y);
+      ctx.lineTo(p.x, p.y + 8);
+      ctx.lineTo(p.x - 8, p.y);
+      ctx.closePath();
+      ctx.fill();
+
+      // Flanking secondary diamonds
+      if (p.isHoriz) {
+        [-16, 16].forEach(dx => {
+          ctx.beginPath();
+          ctx.moveTo(p.x + dx, p.y - 5);
+          ctx.lineTo(p.x + dx + 5, p.y);
+          ctx.lineTo(p.x + dx, p.y + 5);
+          ctx.lineTo(p.x + dx - 5, p.y);
+          ctx.closePath();
+          ctx.fill();
+        });
+      } else {
+        [-16, 16].forEach(dy => {
+          ctx.beginPath();
+          ctx.moveTo(p.x - 5, p.y + dy);
+          ctx.lineTo(p.x, p.y + dy - 5);
+          ctx.lineTo(p.x + 5, p.y + dy);
+          ctx.lineTo(p.x, p.y + dy + 5);
+          ctx.closePath();
+          ctx.fill();
+        });
+      }
+    });
+
+    ctx.restore();
+  },
+
+
+  // ═══════════════════════════════════════════════════════
+  //  2.1 FLANK ORNAMENTS — Filling Left & Right Space
+  // ═══════════════════════════════════════════════════════
+
+  /**
+   * Solves the "left right part looking very empty" issue by adding:
+   * 1. Running vertical filigree diamond ribbons on left (x=96) and right (x=W-96)
+   * 2. Ornate heraldic diamond crests at quarter-heights and mid-height on both flanks
+   * 3. Vertical micro-security ribbon in delicate gold
+   */
+  drawFlankDecorativeElements(ctx) {
+    const W = this.WIDTH, H = this.HEIGHT;
+    const cy = H / 2;
+    const C = this.COLORS;
+
+    const leftX = 96;
+    const rightX = W - 96;
+    const yStart = 150;
+    const yEnd = H - 150;
+    const step = 28;
+
+    ctx.save();
+
+    // ── 1. Vertical Filigree Diamond Ribbons on Left & Right ──
+    [leftX, rightX].forEach(xCol => {
+      // Vertical hairline rule
+      ctx.strokeStyle = 'rgba(197, 153, 58, 0.35)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(xCol, yStart);
+      ctx.lineTo(xCol, yEnd);
+      ctx.stroke();
+
+      // Repeating gold diamonds and micro-dots
+      ctx.fillStyle = C.gold;
+      for (let y = yStart + 20; y <= yEnd - 20; y += step) {
+        ctx.beginPath();
+        ctx.moveTo(xCol, y - 4);
+        ctx.lineTo(xCol + 4, y);
+        ctx.lineTo(xCol, y + 4);
+        ctx.lineTo(xCol - 4, y);
+        ctx.closePath();
+        ctx.fill();
+
+        // Accent dot between diamonds
+        if (y + step / 2 <= yEnd - 20) {
+          ctx.beginPath();
+          ctx.arc(xCol, y + step / 2, 1.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    });
+
+    // ── 2. Ornate Heraldic Diamond Crests on Left & Right Flanks ──
+    const flankCrestsY = [cy - 380, cy, cy + 380];
+    [leftX, rightX].forEach(xCol => {
+      flankCrestsY.forEach(yPos => {
+        // Outer halo
+        ctx.save();
+        ctx.strokeStyle = 'rgba(197, 153, 58, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(xCol, yPos, 16, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Solid gold center diamond
+        ctx.fillStyle = C.gold;
+        ctx.beginPath();
+        ctx.moveTo(xCol, yPos - 9);
+        ctx.lineTo(xCol + 9, yPos);
+        ctx.lineTo(xCol, yPos + 9);
+        ctx.lineTo(xCol - 9, yPos);
+        ctx.closePath();
+        ctx.fill();
+
+        // Inner white micro-diamond
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(xCol, yPos - 4);
+        ctx.lineTo(xCol + 4, yPos);
+        ctx.lineTo(xCol, yPos + 4);
+        ctx.lineTo(xCol - 4, yPos);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+      });
+    });
+
+    // ── 3. Vertical Security Micro-Lettering Ribbon along Left & Right ──
+    const microText = '✦  ELEVATIFIER PRIVATE LIMITED  ✦  AUTHENTICATED INTERNSHIP CREDENTIAL  ✦  ISO 9001:2015  ✦';
+    ctx.font = '700 9.5px "Cinzel", serif';
+    ctx.fillStyle = 'rgba(197, 153, 58, 0.42)';
+    ctx.letterSpacing = '3px';
+
+    // Left vertical ribbon (reading downwards)
+    ctx.save();
+    ctx.translate(leftX - 18, cy);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(microText, 0, 0);
+    ctx.restore();
+
+    // Right vertical ribbon (reading upwards)
+    ctx.save();
+    ctx.translate(rightX + 18, cy);
+    ctx.rotate(Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(microText, 0, 0);
+    ctx.restore();
+
+    ctx.restore();
+  },
+
+
+  // ═══════════════════════════════════════════════════════
+  //  3. HEADER — Logo at Top-Left, Govt Badge at Top-Right,
+  //     Company & Title Centered (Saves Space, Regal Design)
+  // ═══════════════════════════════════════════════════════
+
   async drawHeader(ctx) {
-    const centerX = this.WIDTH / 2;
+    const W = this.WIDTH;
+    const cx = W / 2;
+    const C = this.COLORS;
 
-    // 1. Draw Official Elevatifier Logo
+    // ── TOP-LEFT: Prominent Elevatifier Brand Logo ──
+    const logoX = 135;
+    const logoY = 92;
+    const logoMaxH = 120; // High brand prominence & bold resolution
     let logoDrawn = false;
+
     try {
       const logoImg = await this.loadImage('/Elevatifier-logo.png');
       if (logoImg && logoImg.width) {
-        const targetHeight = 120;
-        const targetWidth = (logoImg.width / logoImg.height) * targetHeight;
-        ctx.drawImage(logoImg, centerX - targetWidth / 2, 142, targetWidth, targetHeight);
+        const h = logoMaxH;
+        const w = (logoImg.width / logoImg.height) * h;
+        ctx.drawImage(logoImg, logoX, logoY, w, h);
         logoDrawn = true;
       }
-    } catch (err) {
-      console.warn('Could not load /Elevatifier-logo.png on canvas, using vector crest fallback:', err);
+    } catch (e) {
+      console.warn('Top-left logo load failed, using vector emblem fallback');
     }
 
     if (!logoDrawn) {
-      // Elegant Fallback Crest
       ctx.save();
-      ctx.translate(centerX, 195);
-      ctx.fillStyle = '#071120';
+      ctx.fillStyle = C.navy;
       ctx.beginPath();
-      ctx.arc(0, 0, 44, 0, Math.PI * 2);
+      ctx.roundRect(logoX, logoY, 135, 115, 10);
       ctx.fill();
-      ctx.strokeStyle = '#d4af37';
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = C.gold;
+      ctx.lineWidth = 2.5;
       ctx.stroke();
-
-      ctx.fillStyle = '#f3d068';
-      ctx.font = 'bold 40px "Cinzel", serif';
+      ctx.fillStyle = C.goldLight;
+      ctx.font = 'bold 54px "Cinzel", serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('E', 0, 2);
+      ctx.fillText('E', logoX + 67, logoY + 57);
       ctx.restore();
     }
 
-    // 2. Brand Name Title
+    // ── TOP-RIGHT: Symmetrical Government Recognition & Accreditation Badge ──
+    this._drawTopRightAccreditationBadge(ctx, W - 135, logoY, logoMaxH);
+
+    // ── CENTER HEADER: Company Name & Main Title ──
     ctx.save();
     ctx.textAlign = 'center';
-    ctx.font = '800 48px "Cinzel", "Times New Roman", serif';
-    ctx.fillStyle = '#071120';
-    ctx.letterSpacing = '8px';
-    ctx.fillText('ELEVATIFIER TECHNOLOGIES', centerX, 296);
 
-    // 3. Institutional Accreditation Subtitle
-    ctx.font = '700 19px "Outfit", sans-serif';
-    ctx.fillStyle = '#b38714';
+    // Company Name: ELEVATIFIER PRIVATE LIMITED
+    ctx.font = '800 42px "Cinzel", "Times New Roman", serif';
+    ctx.fillStyle = C.navy;
+    ctx.letterSpacing = '6.5px';
+    ctx.fillText('ELEVATIFIER PRIVATE LIMITED', cx, 142);
+
+    // Incorporation & Statutory Subtitle
+    ctx.font = '600 14px "Outfit", sans-serif';
+    ctx.fillStyle = C.gold;
     ctx.letterSpacing = '3.5px';
-    ctx.fillText('★  ACCREDITED BY DPIIT (GOVT. OF INDIA) • STARTUP INDIA • ISO 9001:2015 CERTIFIED INSTITUTION  ★', centerX, 336);
+    ctx.fillText('DPIIT RECOGNISED  •  STARTUP INDIA  •  ISO 9001:2015 CERTIFIED', cx, 176);
 
-    // 4. Majestic Main Certificate Title
-    ctx.font = '900 84px "Cinzel", "Times New Roman", serif';
-    ctx.fillStyle = '#071120';
-    ctx.letterSpacing = '8px';
-    ctx.fillText('CERTIFICATE OF INTERNSHIP', centerX, 436);
-
-    // 5. Luxury Divider with Gold Diamond Center
-    ctx.strokeStyle = '#d4af37';
-    ctx.lineWidth = 2.5;
+    // Header Gold Tapered Divider Line
+    const divW = 520;
+    const divY = 202;
+    const divGrad = ctx.createLinearGradient(cx - divW, divY, cx + divW, divY);
+    divGrad.addColorStop(0, 'rgba(197, 153, 58, 0)');
+    divGrad.addColorStop(0.2, 'rgba(197, 153, 58, 0.75)');
+    divGrad.addColorStop(0.5, C.gold);
+    divGrad.addColorStop(0.8, 'rgba(197, 153, 58, 0.75)');
+    divGrad.addColorStop(1, 'rgba(197, 153, 58, 0)');
+    ctx.strokeStyle = divGrad;
+    ctx.lineWidth = 1.8;
     ctx.beginPath();
-    ctx.moveTo(centerX - 460, 474);
-    ctx.lineTo(centerX - 35, 474);
-    ctx.moveTo(centerX + 35, 474);
-    ctx.lineTo(centerX + 460, 474);
+    ctx.moveTo(cx - divW, divY);
+    ctx.lineTo(cx + divW, divY);
     ctx.stroke();
 
-    // Central Gold Diamond Crest
-    ctx.fillStyle = '#d4af37';
+    // Center divider diamond
+    ctx.fillStyle = C.gold;
     ctx.beginPath();
-    ctx.moveTo(centerX, 465);
-    ctx.lineTo(centerX + 9, 474);
-    ctx.lineTo(centerX, 483);
-    ctx.lineTo(centerX - 9, 474);
+    ctx.moveTo(cx, divY - 6);
+    ctx.lineTo(cx + 6, divY);
+    ctx.lineTo(cx, divY + 6);
+    ctx.lineTo(cx - 6, divY);
     ctx.closePath();
     ctx.fill();
 
-    // Flanking Diamond Dots
-    [-460, 460].forEach(offset => {
+    // ── Grand Main Title: CERTIFICATE OF INTERNSHIP ──
+    ctx.font = '900 72px "Cinzel", "Times New Roman", serif';
+    ctx.fillStyle = C.navy;
+    ctx.letterSpacing = '8px';
+    ctx.fillText('CERTIFICATE OF INTERNSHIP', cx, 276);
+
+    // ── Ornate Filigree Underline Beneath Title ──
+    const ddW = 460;
+    const ddY = 312;
+
+    ctx.strokeStyle = C.gold;
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.moveTo(cx - ddW, ddY);
+    ctx.lineTo(cx - 24, ddY);
+    ctx.moveTo(cx + 24, ddY);
+    ctx.lineTo(cx + ddW, ddY);
+    ctx.stroke();
+
+    // Center diamond flourish
+    ctx.fillStyle = C.gold;
+    ctx.beginPath();
+    ctx.moveTo(cx, ddY - 7);
+    ctx.lineTo(cx + 7, ddY);
+    ctx.lineTo(cx, ddY + 7);
+    ctx.lineTo(cx - 7, ddY);
+    ctx.closePath();
+    ctx.fill();
+
+    // End accent diamonds
+    [cx - ddW, cx + ddW].forEach(ex => {
       ctx.beginPath();
-      ctx.moveTo(centerX + offset, 469);
-      ctx.lineTo(centerX + offset + 5, 474);
-      ctx.lineTo(centerX + offset, 479);
-      ctx.lineTo(centerX + offset - 5, 474);
+      ctx.moveTo(ex, ddY - 5);
+      ctx.lineTo(ex + 5, ddY);
+      ctx.lineTo(ex, ddY + 5);
+      ctx.lineTo(ex - 5, ddY);
       ctx.closePath();
       ctx.fill();
     });
@@ -363,571 +615,692 @@ window.CertificateRenderer = {
   },
 
   /**
-   * Draw Candidate Name, Track Pill, and Academic Citations with Optimal Vertical Rhythm
+   * Top-Right Symmetrical Accreditation & Quality Seal Card
    */
-  drawContent(ctx, cert) {
-    const centerX = this.WIDTH / 2;
+  _drawTopRightAccreditationBadge(ctx, rightEdgeX, y, h) {
+    const C = this.COLORS;
+    const cardW = 340;
+    const cardX = rightEdgeX - cardW;
+
+    ctx.save();
+
+    // Card background with soft shadow
+    ctx.save();
+    ctx.shadowColor = 'rgba(8, 20, 38, 0.06)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 3;
+    ctx.fillStyle = C.creamCard;
+    ctx.beginPath();
+    ctx.roundRect(cardX, y, cardW, h, 8);
+    ctx.fill();
+    ctx.restore();
+
+    // Gold outer frame
+    ctx.strokeStyle = C.gold;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(cardX, y, cardW, h, 8);
+    ctx.stroke();
+
+    // Inner navy hairline
+    ctx.strokeStyle = 'rgba(8, 20, 38, 0.12)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.roundRect(cardX + 3.5, y + 3.5, cardW - 7, h - 7, 6);
+    ctx.stroke();
+
+    // Text content
+    ctx.textAlign = 'center';
+
+    ctx.font = '700 11.5px "Cinzel", serif';
+    ctx.fillStyle = C.gold;
+    ctx.letterSpacing = '1.8px';
+    ctx.fillText('✦  GOVERNMENT OF INDIA  ✦', cardX + cardW / 2, y + 28);
+
+    ctx.font = '800 16.5px "Cinzel", serif';
+    ctx.fillStyle = C.navy;
+    ctx.letterSpacing = '1px';
+    ctx.fillText('RECOGNISED ENTITY', cardX + cardW / 2, y + 55);
+
+    // Divider line
+    ctx.strokeStyle = C.borderGold;
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(cardX + 30, y + 68);
+    ctx.lineTo(cardX + cardW - 30, y + 68);
+    ctx.stroke();
+
+    ctx.font = '600 12.5px "Outfit", sans-serif';
+    ctx.fillStyle = C.textSlate;
+    ctx.letterSpacing = '0.5px';
+    ctx.fillText('DPIIT  •  STARTUP INDIA  •  ISO 9001', cardX + cardW / 2, y + 88);
+
+    ctx.font = '600 11px "Outfit", sans-serif';
+    ctx.fillStyle = C.greenBadge;
+    ctx.letterSpacing = '0.5px';
+    ctx.fillText('● ACCREDITED ACADEMIC CREDENTIAL', cardX + cardW / 2, y + 107);
+
+    ctx.restore();
+  },
+
+
+  // ═══════════════════════════════════════════════════════
+  //  4. BODY — Candidate Name, College, Domain, Tenure
+  // ═══════════════════════════════════════════════════════
+
+  drawBodyContent(ctx, cert) {
+    const cx = this.WIDTH / 2;
+    const C = this.COLORS;
 
     ctx.save();
     ctx.textAlign = 'center';
 
-    // 1. Preamble Line
-    ctx.font = 'italic 500 29px "Georgia", serif';
-    ctx.fillStyle = '#475569';
-    ctx.letterSpacing = '1.5px';
-    ctx.fillText('This is to certify and officially confer that', centerX, 545);
+    // ── Preamble ──
+    ctx.font = 'italic 400 28px "Playfair Display", Georgia, serif';
+    ctx.fillStyle = C.textSlate;
+    ctx.letterSpacing = '1px';
+    ctx.fillText('This is to proudly certify that', cx, 368);
 
-    // 2. Recipient Full Name in Bold Regal Typography with Dynamic Auto-Scale
+    // ── Candidate Name (Prominent, High-Visual Impact) ──
     const studentName = (cert.studentName || 'Candidate Name').toUpperCase();
-    let nameFontSize = 100;
-    ctx.font = `bold ${nameFontSize}px "Cinzel", "Times New Roman", serif`;
-    let nameWidth = ctx.measureText(studentName).width;
-    const maxNameWidth = this.WIDTH - 500;
-    while (nameWidth > maxNameWidth && nameFontSize > 44) {
-      nameFontSize -= 4;
-      ctx.font = `bold ${nameFontSize}px "Cinzel", "Times New Roman", serif`;
-      nameWidth = ctx.measureText(studentName).width;
+    let nameSize = 90;
+    const maxNameW = this.WIDTH - 440;
+    ctx.font = `700 ${nameSize}px "Cinzel", "Times New Roman", serif`;
+    while (ctx.measureText(studentName).width > maxNameW && nameSize > 42) {
+      nameSize -= 3;
+      ctx.font = `700 ${nameSize}px "Cinzel", "Times New Roman", serif`;
     }
-    ctx.fillStyle = '#060e1d';
-    ctx.letterSpacing = '3px';
-    ctx.fillText(studentName, centerX, 655);
+    ctx.fillStyle = C.navy;
+    ctx.letterSpacing = '3.5px';
+    ctx.fillText(studentName, cx, 465);
 
-    // Underline beneath candidate name with gold diamond end caps
-    const barWidth = Math.min(Math.max(nameWidth / 2 + 70, 280), (this.WIDTH - 440) / 2);
-    const underlineY = 690;
+    // ── Gold Tapered Underline Beneath Name ──
+    const nameW = ctx.measureText(studentName).width;
+    const barHalf = Math.min(Math.max(nameW / 2 + 60, 260), (this.WIDTH - 400) / 2);
+    const ulY = 504;
 
-    const barGrad = ctx.createLinearGradient(centerX - barWidth, underlineY, centerX + barWidth, underlineY);
-    barGrad.addColorStop(0, 'rgba(212, 175, 55, 0.2)');
-    barGrad.addColorStop(0.15, '#d4af37');
-    barGrad.addColorStop(0.5, '#fced9e');
-    barGrad.addColorStop(0.85, '#d4af37');
-    barGrad.addColorStop(1, 'rgba(212, 175, 55, 0.2)');
-
+    const barGrad = ctx.createLinearGradient(cx - barHalf, ulY, cx + barHalf, ulY);
+    barGrad.addColorStop(0, 'rgba(197, 153, 58, 0)');
+    barGrad.addColorStop(0.15, C.gold);
+    barGrad.addColorStop(0.5, C.goldBright);
+    barGrad.addColorStop(0.85, C.gold);
+    barGrad.addColorStop(1, 'rgba(197, 153, 58, 0)');
     ctx.strokeStyle = barGrad;
-    ctx.lineWidth = 3.5;
+    ctx.lineWidth = 3.2;
     ctx.beginPath();
-    ctx.moveTo(centerX - barWidth, underlineY);
-    ctx.lineTo(centerX + barWidth, underlineY);
+    ctx.moveTo(cx - barHalf, ulY);
+    ctx.lineTo(cx + barHalf, ulY);
     ctx.stroke();
 
-    // Diamond end caps and center diamond on underline
-    ctx.fillStyle = '#d4af37';
-    [-barWidth, 0, barWidth].forEach(offset => {
+    // Gold diamond accents on underline
+    ctx.fillStyle = C.gold;
+    [cx - barHalf, cx, cx + barHalf].forEach(dx => {
       ctx.beginPath();
-      ctx.moveTo(centerX + offset, underlineY - 6);
-      ctx.lineTo(centerX + offset + 6, underlineY);
-      ctx.lineTo(centerX + offset, underlineY + 6);
-      ctx.lineTo(centerX + offset - 6, underlineY);
+      ctx.moveTo(dx, ulY - 5);
+      ctx.lineTo(dx + 5, ulY);
+      ctx.lineTo(dx, ulY + 5);
+      ctx.lineTo(dx - 5, ulY);
       ctx.closePath();
       ctx.fill();
     });
 
-    // 3. College & Degree Affiliation
-    const college = cert.college ? cert.college.trim() : '';
-    const degree = cert.degree ? cert.degree.trim() : '';
-    let affiliationText = '';
+    // ── College / Degree Affiliation ──
+    const college = (cert.college || '').trim();
+    const degree = (cert.degree || '').trim();
+    let affiliation = '';
     if (college && degree) {
-      affiliationText = `representing ${degree}, ${college}`;
+      affiliation = `${degree}, ${college}`;
     } else if (college) {
-      affiliationText = `representing ${college}`;
+      affiliation = college;
     }
 
-    if (affiliationText) {
-      let affFontSize = 29;
-      ctx.font = `600 ${affFontSize}px "Outfit", sans-serif`;
-      let affWidth = ctx.measureText(affiliationText).width;
-      while (affWidth > this.WIDTH - 460 && affFontSize > 18) {
-        affFontSize -= 2;
-        ctx.font = `600 ${affFontSize}px "Outfit", sans-serif`;
-        affWidth = ctx.measureText(affiliationText).width;
+    if (affiliation) {
+      let affSize = 25.5;
+      ctx.font = `500 ${affSize}px "Outfit", sans-serif`;
+      while (ctx.measureText(affiliation).width > this.WIDTH - 440 && affSize > 16) {
+        affSize -= 1;
+        ctx.font = `500 ${affSize}px "Outfit", sans-serif`;
       }
-      ctx.fillStyle = '#334155';
-      ctx.fillText(affiliationText, centerX, 748);
+      ctx.fillStyle = C.textBody;
+      ctx.letterSpacing = '0.6px';
+      ctx.fillText(affiliation, cx, 552);
     }
 
-    // 4. Citation Statement
-    ctx.font = '400 28.5px "Outfit", sans-serif';
-    ctx.fillStyle = '#475569';
-    ctx.fillText('has successfully fulfilled all academic curriculum criteria and completed an intensive', centerX, 818);
+    // ── Completion Statement ──
+    ctx.font = 'italic 400 24px "Playfair Display", Georgia, serif';
+    ctx.fillStyle = C.textSlate;
+    ctx.letterSpacing = '0.5px';
+    ctx.fillText(
+      'has successfully completed all rigorous academic criteria and project deliverables of an intensive',
+      cx, 606
+    );
 
-    // 5. Distinctive Executive Duration Pill
+    // ── Duration Pill Badge (Substantial, Centered) ──
     const duration = (cert.duration || '3 Months').toUpperCase();
-    this.drawDurationBadge(ctx, centerX, 886, duration);
+    this._drawDurationPill(ctx, cx, 670, duration);
 
-    // 6. Domain Citation
-    ctx.font = '500 28px "Outfit", sans-serif';
-    ctx.fillStyle = '#475569';
-    ctx.fillText('in the specialized industry domain of', centerX, 956);
+    // ── Specialized Domain Header ──
+    ctx.font = 'italic 400 24px "Playfair Display", Georgia, serif';
+    ctx.fillStyle = C.textSlate;
+    ctx.letterSpacing = '0.5px';
+    ctx.fillText('professional internship program in the specialized domain of', cx, 736);
 
+    // ── Domain Name (Bold Navy, Regal Scale) ──
     const domain = (cert.domain || 'Professional Domain').toUpperCase();
-    let domFontSize = 56;
-    ctx.font = `900 ${domFontSize}px "Cinzel", "Times New Roman", serif`;
-    let domWidth = ctx.measureText(domain).width;
-    while (domWidth > this.WIDTH - 460 && domFontSize > 32) {
-      domFontSize -= 3;
-      ctx.font = `900 ${domFontSize}px "Cinzel", "Times New Roman", serif`;
-      domWidth = ctx.measureText(domain).width;
+    let domSize = 52;
+    ctx.font = `800 ${domSize}px "Cinzel", "Times New Roman", serif`;
+    while (ctx.measureText(domain).width > this.WIDTH - 400 && domSize > 30) {
+      domSize -= 2;
+      ctx.font = `800 ${domSize}px "Cinzel", "Times New Roman", serif`;
     }
-    ctx.fillStyle = '#071120';
+    ctx.fillStyle = C.navy;
     ctx.letterSpacing = '3.5px';
-    ctx.fillText(domain, centerX, 1030);
+    ctx.fillText(domain, cx, 808);
 
-    // 7. Performance Commendation & Verified Tenure
-    let tenureLine1 = 'During this tenure, the candidate demonstrated exceptional diligence, engineering competency,';
+    // ── Tenure & Assessment Performance Citation ──
+    ctx.font = '500 21px "Outfit", sans-serif';
+    ctx.fillStyle = C.textBody;
+    ctx.letterSpacing = '0.4px';
+
     if (cert.startDate && cert.endDate) {
-      tenureLine1 = `Tenure: ${cert.startDate} to ${cert.endDate} • Practical Assessment & Verified Capstone Implementation`;
+      ctx.fillText(
+        `Program Tenure: ${cert.startDate} — ${cert.endDate}   •   Verified Capstone Project & Technical Assessment`,
+        cx, 870
+      );
+    } else {
+      ctx.fillText(
+        'Verified Practical Implementation   •   Supervised Industry Capstone Assessment & Code Evaluation',
+        cx, 870
+      );
     }
-    ctx.font = '400 25px "Outfit", sans-serif';
-    ctx.fillStyle = '#475569';
-    ctx.fillText(tenureLine1, centerX, 1105);
 
-    ctx.fillText('Demonstrating exemplary diligence, technical competency, and professional commitment across assigned projects.', centerX, 1148);
+    ctx.font = '400 18px "Outfit", sans-serif';
+    ctx.fillStyle = C.textMuted;
+    ctx.letterSpacing = '0.3px';
+    ctx.fillText(
+      'The candidate demonstrated distinguished engineering capability, diligence, and professional excellence.',
+      cx, 904
+    );
 
     ctx.restore();
   },
 
   /**
-   * Draw executive pill for internship duration
+   * Draw substantial navy pill with dual gold framing for duration
    */
-  drawDurationBadge(ctx, x, y, duration) {
+  _drawDurationPill(ctx, x, y, duration) {
     ctx.save();
-    const text = `✦   ${duration} ADVANCED PROFESSIONAL INTERNSHIP   ✦`;
-    ctx.font = '800 26px "Cinzel", serif';
+    const label = `✦   ${duration} PROFESSIONAL INTERNSHIP PROGRAM   ✦`;
+    ctx.font = '700 21px "Cinzel", serif';
     ctx.letterSpacing = '2.5px';
-    const textWidth = ctx.measureText(text).width;
-    const paddingX = 42;
-    const height = 52;
+    const tw = ctx.measureText(label).width;
+    const px = 48, h = 48;
+    const totalW = tw + px * 2;
 
-    // Pill background
-    ctx.fillStyle = '#071120';
+    // Dark navy solid fill
+    ctx.fillStyle = this.COLORS.navy;
     ctx.beginPath();
-    ctx.roundRect(x - (textWidth + paddingX * 2) / 2, y - height / 2, textWidth + paddingX * 2, height, 26);
+    ctx.roundRect(x - totalW / 2, y - h / 2, totalW, h, 24);
     ctx.fill();
 
-    // Dual Gold Border
-    ctx.strokeStyle = '#d4af37';
+    // Outer gold border
+    ctx.strokeStyle = this.COLORS.gold;
     ctx.lineWidth = 2.2;
     ctx.stroke();
 
-    ctx.strokeStyle = 'rgba(252, 237, 158, 0.4)';
-    ctx.lineWidth = 1;
+    // Inner gold hairline
+    ctx.strokeStyle = 'rgba(232, 201, 106, 0.45)';
+    ctx.lineWidth = 0.8;
     ctx.beginPath();
-    ctx.roundRect(x - (textWidth + paddingX * 2) / 2 + 3, y - height / 2 + 3, textWidth + paddingX * 2 - 6, height - 6, 23);
+    ctx.roundRect(x - totalW / 2 + 3.5, y - h / 2 + 3.5, totalW - 7, h - 7, 21);
     ctx.stroke();
 
-    // Glowing Gold Text
-    ctx.fillStyle = '#fced9e';
+    // Gold label text
+    ctx.fillStyle = this.COLORS.goldLight;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, x, y + 2);
+    ctx.fillText(label, x, y + 1);
 
     ctx.restore();
   },
 
-  /**
-   * Draw Footer: Government Badges, Authorized Signatory, Official Stamp, 3D Gold Ribbon Seal, Dynamic QR & Verification Strip
-   */
-  async drawFooterAndSecurity(ctx, cert) {
-    const centerX = this.WIDTH / 2;
 
-    // 0. Institutional Recognition Strip (DPIIT, Startup India, Start in UP, MoE Cell, AKTU, Bank of Baroda)
-    // Vertically placed at y = 1275px to harmonize canvas proportions
-    await this.drawRecognitionBadges(ctx, centerX, 1275);
+  // ═══════════════════════════════════════════════════════
+  //  5. RECOGNITIONS — Larger, Crisp, Perfectly Balanced
+  // ═══════════════════════════════════════════════════════
 
-    const bottomY = 1690;
+  async drawRecognitionStrip(ctx) {
+    const cx = this.WIDTH / 2;
+    const C = this.COLORS;
+    const headerY = 955;
 
-    // 1. Left Side: Authorized Signatory + Official Security Stamp
-    this.drawSignatoryAndStamp(ctx, 520, bottomY);
-
-    // 2. Center: 3D Embossed Metallic Gold Rosette Seal with Ribbons
-    this.drawEmbossedGoldSeal(ctx, centerX, bottomY - 35);
-
-    // 3. Right Side: High-Contrast Scannable Dynamic QR Code
-    await this.drawSecurityQrCode(ctx, cert, this.WIDTH - 520, bottomY - 15);
-
-    // 4. Bottom Deep Security & Verification Strip
-    this.drawBottomSecurityStrip(ctx, cert);
-  },
-
-  /**
-   * Draw Government & Institutional Partner Recognition Badges on Certificate
-   */
-  async drawRecognitionBadges(ctx, centerX, y) {
     ctx.save();
     ctx.textAlign = 'center';
 
-    // Header Label
-    ctx.font = '800 18px "Cinzel", serif';
-    ctx.fillStyle = '#b38714';
-    ctx.letterSpacing = '3px';
-    ctx.fillText('★  GOVERNMENT ACCREDITED & INSTITUTIONAL RECOGNITIONS  ★', centerX, y);
+    // Section Header
+    ctx.font = '700 15px "Cinzel", serif';
+    ctx.fillStyle = C.gold;
+    ctx.letterSpacing = '3.5px';
+    ctx.fillText('GOVERNMENT & INSTITUTIONAL ACCREDITATIONS', cx, headerY);
 
-    // Subtle divider lines flanking the header
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.45)';
-    ctx.lineWidth = 1.2;
+    // Flanking gold decorative lines
+    const textHalfW = ctx.measureText('GOVERNMENT & INSTITUTIONAL ACCREDITATIONS').width / 2 + 24;
+    const lineW = 200;
+    ctx.strokeStyle = C.borderGold;
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(centerX - 560, y - 6);
-    ctx.lineTo(centerX - 330, y - 6);
-    ctx.moveTo(centerX + 330, y - 6);
-    ctx.lineTo(centerX + 560, y - 6);
+    ctx.moveTo(cx - textHalfW - lineW, headerY);
+    ctx.lineTo(cx - textHalfW, headerY);
+    ctx.moveTo(cx + textHalfW, headerY);
+    ctx.lineTo(cx + textHalfW + lineW, headerY);
     ctx.stroke();
 
-    // 6 official recognition logos
+    // End dots on flanking lines
+    ctx.fillStyle = C.gold;
+    [cx - textHalfW - lineW, cx + textHalfW + lineW].forEach(dx => {
+      ctx.beginPath();
+      ctx.arc(dx, headerY, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Recognition Logos — Larger cards for supreme visibility (205 × 82 px)
     const logos = [
-      { file: '/images/recognitions/dpiit.png', altFile: '/images/recognitions/12.png', name: 'DPIIT' },
-      { file: '/images/recognitions/startup-india.png', altFile: '/images/recognitions/11.png', name: 'Startup India' },
-      { file: '/images/recognitions/start-in-up.png', altFile: '/images/recognitions/10.png', name: 'Start in UP' },
-      { file: '/images/recognitions/moe-cell.png', altFile: '/images/recognitions/8.png', name: 'MoE Cell' },
-      { file: '/images/recognitions/aktu.png', altFile: '/images/recognitions/6.png', name: 'AKTU' },
-      { file: '/images/recognitions/bank-of-baroda.png', altFile: '/images/recognitions/9.png', name: 'Bank of Baroda' }
+      { file: '/images/recognitions/12.png', name: 'DPIIT' },
+      { file: '/images/recognitions/11.png', name: 'Startup India' },
+      { file: '/images/recognitions/10.png', name: 'Start in UP' },
+      { file: '/images/recognitions/8.png', name: 'MoE Cell' },
+      { file: '/images/recognitions/6.png', name: 'AKTU' },
+      { file: '/images/recognitions/9.png', name: 'Bank of Baroda' },
     ];
 
-    const totalLogos = logos.length;
-    const badgeWidth = 155;
-    const badgeHeight = 70;
-    const gap = 34;
-    const totalRowWidth = (totalLogos * badgeWidth) + ((totalLogos - 1) * gap);
-    let startX = centerX - (totalRowWidth / 2);
+    const badgeW = 205, badgeH = 82, gap = 26;
+    const totalRowW = logos.length * badgeW + (logos.length - 1) * gap;
+    const startX = cx - totalRowW / 2;
+    const badgeY = headerY + 18;
 
-    for (let i = 0; i < totalLogos; i++) {
-      const item = logos[i];
-      const bx = startX + i * (badgeWidth + gap);
-      const by = y + 26;
+    for (let i = 0; i < logos.length; i++) {
+      const bx = startX + i * (badgeW + gap);
+      const by = badgeY;
 
-      // Draw crisp white card with delicate gold hairline & soft shadow
+      // Card shadow
       ctx.save();
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.08)';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.06)';
       ctx.shadowBlur = 10;
-      ctx.shadowOffsetY = 4;
+      ctx.shadowOffsetY = 3;
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.roundRect(bx, by, badgeWidth, badgeHeight, 10);
+      ctx.roundRect(bx, by, badgeW, badgeH, 8);
       ctx.fill();
       ctx.restore();
 
-      ctx.strokeStyle = 'rgba(212, 175, 55, 0.55)';
-      ctx.lineWidth = 1.5;
+      // Card gold border
+      ctx.strokeStyle = C.borderGold;
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.roundRect(bx, by, badgeWidth, badgeHeight, 10);
+      ctx.roundRect(bx, by, badgeW, badgeH, 8);
       ctx.stroke();
 
+      // Card inner subtle hairline
+      ctx.strokeStyle = 'rgba(197, 153, 58, 0.18)';
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      ctx.roundRect(bx + 2.5, by + 2.5, badgeW - 5, badgeH - 5, 6);
+      ctx.stroke();
+
+      // Render logo image with padding
       let img = null;
       try {
-        img = await this.loadImage(item.file);
-      } catch (err1) {
-        if (item.altFile) {
-          try {
-            img = await this.loadImage(item.altFile);
-          } catch (err2) {}
-        }
-      }
+        img = await this.loadImage(logos[i].file);
+      } catch (e) { }
 
       if (img && img.width) {
-        const maxImgH = badgeHeight - 16;
-        const maxImgW = badgeWidth - 20;
-        const scale = Math.min(maxImgW / img.width, maxImgH / img.height);
+        const maxH = badgeH - 16;
+        const maxW = badgeW - 20;
+        const scale = Math.min(maxW / img.width, maxH / img.height);
         const dw = img.width * scale;
         const dh = img.height * scale;
-        ctx.drawImage(img, bx + (badgeWidth - dw) / 2, by + (badgeHeight - dh) / 2, dw, dh);
+        ctx.drawImage(img, bx + (badgeW - dw) / 2, by + (badgeH - dh) / 2, dw, dh);
       } else {
         // Fallback text
-        ctx.fillStyle = '#071120';
+        ctx.fillStyle = C.navy;
         ctx.font = '700 13px "Outfit", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(item.name, bx + badgeWidth / 2, by + badgeHeight / 2);
+        ctx.fillText(logos[i].name, bx + badgeW / 2, by + badgeH / 2);
       }
     }
 
     ctx.restore();
   },
 
-  /**
-   * Draw authorized director signature and official institutional circular council stamp
-   */
-  drawSignatoryAndStamp(ctx, x, y) {
-    ctx.save();
-    ctx.translate(x, y);
 
-    // 1. Authentic Digital Signature Script
-    // Prioritizes Great Vibes (Google Font loaded) with Brush Script fallback
-    ctx.font = 'normal 74px "Great Vibes", "Brush Script MT", cursive, serif';
-    ctx.fillStyle = '#060e1c';
-    ctx.textAlign = 'center';
-    ctx.fillText('Shivansh Vasu', 0, -38);
+  // ═══════════════════════════════════════════════════════
+  //  6. FOOTER — Executive 3-Pillar Layout (Clean Signature, No Stamp)
+  // ═══════════════════════════════════════════════════════
 
-    // Signature horizontal line
-    ctx.strokeStyle = '#071120';
-    ctx.lineWidth = 2.8;
+  async drawFooterSection(ctx, cert) {
+    const cx = this.WIDTH / 2;
+    const C = this.COLORS;
+
+    // ── Elegant Top Separator Line ──
+    const sepY = 1115;
+    const sepGrad = ctx.createLinearGradient(130, sepY, this.WIDTH - 130, sepY);
+    sepGrad.addColorStop(0, 'rgba(197, 153, 58, 0)');
+    sepGrad.addColorStop(0.2, C.borderGold);
+    sepGrad.addColorStop(0.5, C.gold);
+    sepGrad.addColorStop(0.8, C.borderGold);
+    sepGrad.addColorStop(1, 'rgba(197, 153, 58, 0)');
+    ctx.strokeStyle = sepGrad;
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
-    ctx.moveTo(-195, 0);
-    ctx.lineTo(195, 0);
+    ctx.moveTo(130, sepY);
+    ctx.lineTo(this.WIDTH - 130, sepY);
     ctx.stroke();
 
-    // Gold diamond flourish on signature line ends
-    ctx.fillStyle = '#d4af37';
-    [-195, 195].forEach(offset => {
+    // Center diamond on separator line
+    ctx.fillStyle = C.gold;
+    ctx.beginPath();
+    ctx.moveTo(cx, sepY - 5);
+    ctx.lineTo(cx + 5, sepY);
+    ctx.lineTo(cx, sepY + 5);
+    ctx.lineTo(cx - 5, sepY);
+    ctx.closePath();
+    ctx.fill();
+
+    // ── 3-Pillar Balanced Executive Layout ──
+    // Pillar 1 (Left):   Authorized Signatory (Shivansh Vasu) — Clean, NO Stamp
+    // Pillar 2 (Center): Official Credential & Blockchain Security Plate
+    // Pillar 3 (Right):  Dynamic QR Code + Instant Verification
+    const colLeftX = 460;
+    const colCenterX = cx;
+    const colRightX = this.WIDTH - 460;
+    const baseY = 1315;
+
+    // Pillar 1: Signature (Pure, elegant, no stamp)
+    this._drawSignature(ctx, colLeftX, baseY);
+
+    // Pillar 2: Official Credential Plate
+    this._drawCredentialPlate(ctx, cert, colCenterX, baseY);
+
+    // Pillar 3: Dynamic QR Code
+    await this._drawQRSection(ctx, cert, colRightX, baseY);
+
+    // ── Bottom Verification Strip (with generous 40+ px clearance from border) ──
+    this._drawVerificationStrip(ctx, cert);
+  },
+
+  /**
+   * Pillar 1: Authorized Signatory block (Stamp Removed for Clean Prestige)
+   */
+  _drawSignature(ctx, x, y) {
+    const C = this.COLORS;
+    ctx.save();
+    ctx.textAlign = 'center';
+
+    // Executive Cursive Signature (Shivansh Vasu)
+    ctx.font = '400 72px "Great Vibes", "Brush Script MT", cursive';
+    ctx.fillStyle = C.navy;
+    ctx.fillText('Shivansh Vasu', x, y - 46);
+
+    // Signature line
+    ctx.strokeStyle = C.navy;
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.moveTo(x - 180, y - 6);
+    ctx.lineTo(x + 180, y - 6);
+    ctx.stroke();
+
+    // Gold diamond tips on signature line
+    ctx.fillStyle = C.gold;
+    [-180, 180].forEach(offset => {
       ctx.beginPath();
-      ctx.moveTo(offset, -6);
-      ctx.lineTo(offset + 6, 0);
-      ctx.lineTo(offset, 6);
-      ctx.lineTo(offset - 6, 0);
+      ctx.moveTo(x + offset, y - 10);
+      ctx.lineTo(x + offset + 5, y - 6);
+      ctx.lineTo(x + offset, y - 2);
+      ctx.lineTo(x + offset - 5, y - 6);
       ctx.closePath();
       ctx.fill();
     });
 
-    // Signatory credentials
+    // Signatory Name
     ctx.font = '800 22px "Cinzel", serif';
-    ctx.fillStyle = '#071120';
-    ctx.letterSpacing = '1.8px';
-    ctx.fillText('SHIVANSH VASU', 0, 32);
+    ctx.fillStyle = C.navy;
+    ctx.letterSpacing = '2.2px';
+    ctx.fillText('SHIVANSH VASU', x, y + 30);
 
-    ctx.font = '700 16px "Outfit", sans-serif';
-    ctx.fillStyle = '#b38714';
+    // Signatory Title
+    ctx.font = '600 15px "Outfit", sans-serif';
+    ctx.fillStyle = C.gold;
     ctx.letterSpacing = '1px';
-    ctx.fillText('Founder & Managing Director', 0, 56);
+    ctx.fillText('Founder & Managing Director', x, y + 54);
 
-    ctx.font = '500 15px "Outfit", sans-serif';
-    ctx.fillStyle = '#64748b';
+    // Company Name: ELEVATIFIER PRIVATE LIMITED
+    ctx.font = '500 14px "Outfit", sans-serif';
+    ctx.fillStyle = C.textMuted;
     ctx.letterSpacing = '0.5px';
-    ctx.fillText('Elevatifier Technologies Pvt. Ltd.', 0, 78);
-
-    // 2. Official Circular Authentication Council Stamp (Crimson Red Watermark)
-    ctx.translate(105, -72);
-    ctx.rotate(-0.19);
-
-    ctx.strokeStyle = 'rgba(185, 28, 28, 0.48)';
-    ctx.lineWidth = 2.8;
-    ctx.beginPath();
-    ctx.arc(0, 0, 68, 0, Math.PI * 2);
-    ctx.stroke();
-
-    ctx.strokeStyle = 'rgba(185, 28, 28, 0.32)';
-    ctx.lineWidth = 1.3;
-    ctx.beginPath();
-    ctx.arc(0, 0, 58, 0, Math.PI * 2);
-    ctx.stroke();
-
-    ctx.fillStyle = 'rgba(185, 28, 28, 0.65)';
-    ctx.font = '800 11px "Cinzel", serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('★ ELEVATIFIER TECHNOLOGIES ★', 0, -34);
-    ctx.fillText('OFFICIALLY VERIFIED', 0, 0);
-    ctx.fillText('ACADEMIC COUNCIL', 0, 34);
+    ctx.fillText('Elevatifier Private Limited', x, y + 76);
 
     ctx.restore();
   },
 
   /**
-   * Draw high-fidelity 3D metallic gold rosette seal with hanging satin ribbons
+   * Pillar 2: Official Credential Plate (Clean, prestigious digital registry box)
    */
-  drawEmbossedGoldSeal(ctx, x, y) {
+  _drawCredentialPlate(ctx, cert, x, y) {
+    const C = this.COLORS;
     ctx.save();
-    ctx.translate(x, y);
-
-    // Luxury Satin Ribbons extending downward
-    // Left ribbon tail (Royal Navy with Gold Edge)
-    ctx.fillStyle = '#081730';
-    ctx.beginPath();
-    ctx.moveTo(-45, 60);
-    ctx.lineTo(-78, 185);
-    ctx.lineTo(-42, 162);
-    ctx.lineTo(-6, 185);
-    ctx.lineTo(-15, 60);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = '#b38714';
-    ctx.beginPath();
-    ctx.moveTo(-45, 60);
-    ctx.lineTo(-78, 185);
-    ctx.lineTo(-72, 185);
-    ctx.lineTo(-42, 162);
-    ctx.lineTo(-42, 165);
-    ctx.closePath();
-    ctx.fill();
-
-    // Right ribbon tail (Royal Gold with Navy Core)
-    ctx.fillStyle = '#b38714';
-    ctx.beginPath();
-    ctx.moveTo(45, 60);
-    ctx.lineTo(78, 185);
-    ctx.lineTo(42, 162);
-    ctx.lineTo(6, 185);
-    ctx.lineTo(15, 60);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = '#081730';
-    ctx.beginPath();
-    ctx.moveTo(35, 60);
-    ctx.lineTo(65, 178);
-    ctx.lineTo(42, 162);
-    ctx.lineTo(18, 178);
-    ctx.lineTo(22, 60);
-    ctx.closePath();
-    ctx.fill();
-
-    // 36-Point Starburst Rosette Badge
-    const numPoints = 36;
-    const outerR = 108;
-    const innerR = 98;
-
-    ctx.beginPath();
-    for (let i = 0; i < numPoints * 2; i++) {
-      const r = i % 2 === 0 ? outerR : innerR;
-      const angle = (i * Math.PI) / numPoints;
-      const px = Math.cos(angle) * r;
-      const py = Math.sin(angle) * r;
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    }
-    ctx.closePath();
-    ctx.fillStyle = '#d4af37';
-    ctx.fill();
-    ctx.lineWidth = 2.6;
-    ctx.strokeStyle = '#8f6707';
-    ctx.stroke();
-
-    // 3D Metallic Gold Center Medallion
-    const grad = ctx.createRadialGradient(-26, -26, 10, 0, 0, 92);
-    grad.addColorStop(0, '#fffde8');
-    grad.addColorStop(0.28, '#f7df8d');
-    grad.addColorStop(0.68, '#d4af37');
-    grad.addColorStop(1, '#8c6405');
-
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(0, 0, 88, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Inner Concentric Engraving Rings
-    ctx.strokeStyle = '#7c5b07';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(0, 0, 77, 0, Math.PI * 2);
-    ctx.stroke();
-
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc(0, 0, 72, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Seal Engraved Text
-    ctx.fillStyle = '#071120';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = '900 13px "Cinzel", serif';
+
+    const cardW = 580;
+    const cardH = 205;
+    const cardX = x - cardW / 2;
+    const cardY = y - 114;
+
+    // Card background with subtle shadow
+    ctx.save();
+    ctx.shadowColor = 'rgba(8, 20, 38, 0.07)';
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 4;
+    ctx.fillStyle = C.creamCard;
+    ctx.beginPath();
+    ctx.roundRect(cardX, cardY, cardW, cardH, 10);
+    ctx.fill();
+    ctx.restore();
+
+    // Outer gold border
+    ctx.strokeStyle = C.gold;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.roundRect(cardX, cardY, cardW, cardH, 10);
+    ctx.stroke();
+
+    // Inner pinstripe border
+    ctx.strokeStyle = 'rgba(8, 20, 38, 0.12)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.roundRect(cardX + 4, cardY + 4, cardW - 8, cardH - 8, 8);
+    ctx.stroke();
+
+    // Top Card Banner Title
+    ctx.font = '700 13px "Cinzel", serif';
+    ctx.fillStyle = C.gold;
     ctx.letterSpacing = '2px';
-    ctx.fillText('ELEVATIFIER', 0, -32);
+    ctx.fillText('✦   OFFICIAL CREDENTIAL RECORD   ✦', x, cardY + 28);
 
-    ctx.font = '900 19px "Cinzel", serif';
-    ctx.letterSpacing = '1px';
-    ctx.fillText('SEAL OF', 0, -8);
-    ctx.fillText('AUTHENTICITY', 0, 16);
+    // Certificate ID Pill Container
+    const certId = cert.certificateId || 'ELV-2026-T69FC9';
+    const idBoxW = 450;
+    const idBoxH = 40;
+    const idBoxY = cardY + 46;
 
-    ctx.font = 'bold 12px "Outfit", sans-serif';
-    ctx.fillStyle = '#7c5b07';
-    ctx.fillText('★ VERIFIED ★', 0, 42);
+    ctx.fillStyle = C.navy;
+    ctx.beginPath();
+    ctx.roundRect(x - idBoxW / 2, idBoxY, idBoxW, idBoxH, 6);
+    ctx.fill();
 
-    ctx.font = 'bold 10px "Outfit", sans-serif';
-    ctx.fillText('ISO 9001:2015', 0, 57);
+    ctx.strokeStyle = C.goldLight;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    ctx.font = '700 19px "Outfit", monospace';
+    ctx.fillStyle = '#ffffff';
+    ctx.letterSpacing = '1.8px';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`ID: ${certId}`, x, idBoxY + idBoxH / 2);
+
+    // Issue Date & Authority
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = '600 14.5px "Outfit", sans-serif';
+    ctx.fillStyle = C.textBody;
+    ctx.letterSpacing = '0.5px';
+    ctx.fillText(`DATE OF ISSUANCE: ${cert.issueDate || '10 SEPT 2026'}`, x, cardY + 126);
+
+    // Security Accreditation Text
+    ctx.font = '400 13px "Outfit", sans-serif';
+    ctx.fillStyle = C.textSlate;
+    ctx.fillText('Tamper-Evident Record   •   Elevatifier Academic Registry', x, cardY + 152);
+
+    // Green Cryptographic Badge
+    ctx.font = '700 12.5px "Outfit", sans-serif';
+    ctx.fillStyle = C.greenBadge;
+    ctx.letterSpacing = '0.5px';
+    ctx.fillText('● CRYPTOGRAPHICALLY SEALED & VERIFIED', x, cardY + 178);
 
     ctx.restore();
   },
 
   /**
-   * Draw crisp scannable QR Code card and serial metadata
+   * Pillar 3: QR Code card with high-contrast verification scanner (185px)
    */
-  async drawSecurityQrCode(ctx, cert, x, y) {
+  async _drawQRSection(ctx, cert, x, y) {
+    const C = this.COLORS;
     ctx.save();
     ctx.textAlign = 'center';
 
-    const qrSize = 205;
+    const qrSize = 185; // Substantial QR size for instant camera recognition
     const qrX = x - qrSize / 2;
-    const qrY = y - 135;
+    const qrY = y - 110;
 
-    // Solid white background card with double gold/navy border for flawless camera scanning
+    // White card background with shadow
     ctx.save();
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.08)';
     ctx.shadowBlur = 12;
     ctx.shadowOffsetY = 4;
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.roundRect(qrX - 12, qrY - 12, qrSize + 24, qrSize + 24, 10);
+    ctx.roundRect(qrX - 12, qrY - 12, qrSize + 24, qrSize + 24, 8);
     ctx.fill();
     ctx.restore();
 
-    ctx.strokeStyle = '#d4af37';
-    ctx.lineWidth = 3;
+    // Gold frame
+    ctx.strokeStyle = C.gold;
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.roundRect(qrX - 12, qrY - 12, qrSize + 24, qrSize + 24, 10);
+    ctx.roundRect(qrX - 12, qrY - 12, qrSize + 24, qrSize + 24, 8);
     ctx.stroke();
 
-    ctx.strokeStyle = '#071120';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(qrX - 7, qrY - 7, qrSize + 14, qrSize + 14);
+    // Inner navy hairline
+    ctx.strokeStyle = C.navy;
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(qrX - 6, qrY - 6, qrSize + 12, qrSize + 12);
 
     // Draw QR code image
     if (cert.qrCodeDataUrl) {
       try {
         const qrImg = await this.loadImage(cert.qrCodeDataUrl);
         ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
-      } catch (err) {
-        console.warn('Could not render QR code:', err);
+      } catch (e) {
+        console.warn('QR render failed:', e);
       }
     }
 
-    // High-visibility Certificate ID & Issue Date
-    ctx.font = '800 24px "Outfit", monospace';
-    ctx.fillStyle = '#071120';
+    // Top / Bottom Scanner Labels
+    ctx.font = '800 14.5px "Cinzel", serif';
+    ctx.fillStyle = C.navy;
     ctx.letterSpacing = '1.5px';
-    ctx.fillText(`ID: ${cert.certificateId || 'ELV-2026-XXXXXX'}`, x, y + 106);
+    ctx.fillText('SCAN TO VERIFY', x, y + 110);
 
-    ctx.font = '600 18px "Outfit", sans-serif';
-    ctx.fillStyle = '#64748b';
-    ctx.fillText(`Issued: ${cert.issueDate || 'DD MMM YYYY'}`, x, y + 134);
+    ctx.font = '600 12.5px "Outfit", sans-serif';
+    ctx.fillStyle = C.gold;
+    ctx.letterSpacing = '0.5px';
+    ctx.fillText('Official Digital Registry Lookup', x, y + 132);
 
-    ctx.font = 'bold 13px "Outfit", sans-serif';
-    ctx.fillStyle = '#10b981';
-    ctx.fillText('● CRYPTOGRAPHICALLY AUTHENTICATED', x, y + 156);
+    ctx.font = '500 11.5px "Outfit", sans-serif';
+    ctx.fillStyle = C.textMuted;
+    ctx.letterSpacing = '0.3px';
+    ctx.fillText('Academic & Employer Clearance', x, y + 150);
 
     ctx.restore();
   },
 
   /**
-   * Draw Bottom Security & Verification URL Strip
+   * Bottom Verification Strip
+   * FIXED: Sits comfortably above the bottom border with generous 40+ px clearance.
    */
-  drawBottomSecurityStrip(ctx, cert) {
-    const stripY = this.HEIGHT - 105;
-    const centerX = this.WIDTH / 2;
+  _drawVerificationStrip(ctx, cert) {
+    const W = this.WIDTH, H = this.HEIGHT;
+    const cx = W / 2;
+    const C = this.COLORS;
+
+    // Bottom border ends at H - 66 = 1688.
+    // Placing the strip at y = 1618 leaves 42px of clear margin from the border!
+    const stripY = H - 136;
 
     ctx.save();
     ctx.textAlign = 'center';
 
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
-    ctx.lineWidth = 1.5;
+    // Elegant gold separator rule
+    const ruleW = W - 320;
+    const ruleGrad = ctx.createLinearGradient(cx - ruleW / 2, stripY - 16, cx + ruleW / 2, stripY - 16);
+    ruleGrad.addColorStop(0, 'rgba(197, 153, 58, 0)');
+    ruleGrad.addColorStop(0.2, C.borderGold);
+    ruleGrad.addColorStop(0.5, C.gold);
+    ruleGrad.addColorStop(0.8, C.borderGold);
+    ruleGrad.addColorStop(1, 'rgba(197, 153, 58, 0)');
+    ctx.strokeStyle = ruleGrad;
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.moveTo(170, stripY - 22);
-    ctx.lineTo(this.WIDTH - 170, stripY - 22);
+    ctx.moveTo(cx - ruleW / 2, stripY - 16);
+    ctx.lineTo(cx + ruleW / 2, stripY - 16);
     ctx.stroke();
 
-    const verifyDomain = cert.verificationUrl || `https://certify.elevatifier.com/verify/${cert.certificateId || 'ID'}`;
+    // Center diamond on the rule
+    ctx.fillStyle = C.gold;
+    ctx.beginPath();
+    ctx.moveTo(cx, stripY - 20);
+    ctx.lineTo(cx + 4, stripY - 16);
+    ctx.lineTo(cx, stripY - 12);
+    ctx.lineTo(cx - 4, stripY - 16);
+    ctx.closePath();
+    ctx.fill();
 
-    ctx.font = '700 22px "Outfit", sans-serif';
+    // Verification URL line
+    const verifyUrl = cert.verificationUrl ||
+      `https://certify.elevatifier.com/verify/${cert.certificateId || 'ID'}`;
+    ctx.font = '600 16px "Outfit", sans-serif';
     ctx.fillStyle = '#0284c7';
-    ctx.fillText(`PUBLIC VERIFICATION REGISTRY: ${verifyDomain}`, centerX, stripY + 2);
+    ctx.letterSpacing = '0.6px';
+    ctx.fillText(`PUBLIC VERIFICATION REGISTRY: ${verifyUrl}`, cx, stripY + 10);
 
-    ctx.font = '500 16px "Outfit", sans-serif';
-    ctx.fillStyle = '#64748b';
-    ctx.fillText('Official Credential of Elevatifier Technologies • Academic Verification Desk: contact@elevatifier.com', centerX, stripY + 28);
+    // Official Credential & Contact Subtext
+    ctx.font = '400 13px "Outfit", sans-serif';
+    ctx.fillStyle = C.textMuted;
+    ctx.letterSpacing = '0.3px';
+    ctx.fillText(
+      'Official Credential of Elevatifier Private Limited   •   Academic Verification Contact: contact@elevatifier.com',
+      cx, stripY + 34
+    );
 
     ctx.restore();
   },
 
+
+  // ═══════════════════════════════════════════════════════
+  //  UTILITIES
+  // ═══════════════════════════════════════════════════════
+
   /**
-   * Utility to load an image from DataURL / URL as a Promise
+   * Load image as a Promise
    */
   loadImage(src) {
     return new Promise((resolve, reject) => {
@@ -940,12 +1313,14 @@ window.CertificateRenderer = {
   },
 
   /**
-   * Direct download helper - saves high-res PNG into student gallery/downloads
+   * Download certificate as high-quality JPEG (~1 MB)
    */
   downloadAsImage(canvas, filename) {
     const link = document.createElement('a');
-    link.download = filename || 'Elevatifier_Internship_Certificate.png';
-    link.href = canvas.toDataURL('image/png', 1.0);
+    const baseName = (filename || 'Elevatifier_Internship_Certificate')
+      .replace(/\.(png|jpg|jpeg)$/i, '');
+    link.download = `${baseName}.jpg`;
+    link.href = canvas.toDataURL('image/jpeg', 0.92);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

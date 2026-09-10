@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Elevatifier Admin | Certificate Control Panel</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#060913">
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/Elevatifier-logo.png">
@@ -13,7 +15,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Great+Vibes&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet">
   
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -268,14 +270,29 @@
               <div class="input-wrapper">
                 <i class="fa-solid fa-laptop-code input-icon"></i>
                 <select id="admDomain" class="form-control" required>
-                  <option value="Full Stack Web Development">Full Stack Web Development</option>
-                  <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence & Machine Learning</option>
-                  <option value="Data Science & Business Analytics">Data Science & Business Analytics</option>
-                  <option value="Cloud Computing & DevOps">Cloud Computing & DevOps</option>
-                  <option value="Cyber Security & Ethical Hacking">Cyber Security & Ethical Hacking</option>
-                  <option value="Mobile Application Development (Android/iOS)">Mobile Application Development (Android/iOS)</option>
-                  <option value="UI/UX & Product Design">UI/UX & Product Design</option>
-                  <option value="Python Programming & Software Engineering">Python Programming & Software Engineering</option>
+                  <optgroup label="Web & Software Engineering">
+                    <option value="Frontend Web Development">Frontend Web Development</option>
+                    <option value="Backend Web Development & APIs">Backend Web Development & APIs</option>
+                    <option value="Full Stack Web Development" selected>Full Stack Web Development</option>
+                    <option value="Database Administration & Engineering">Database Administration & Engineering</option>
+                    <option value="Python Programming & Software Engineering">Python Programming & Software Engineering</option>
+                    <option value="Mobile Application Development (Android/iOS)">Mobile Application Development (Android/iOS)</option>
+                    <option value="Software QA & Automation Testing">Software QA & Automation Testing</option>
+                  </optgroup>
+                  <optgroup label="AI, Data & Cloud Systems">
+                    <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence & Machine Learning</option>
+                    <option value="Data Science & Business Analytics">Data Science & Business Analytics</option>
+                    <option value="Cloud Computing & DevOps">Cloud Computing & DevOps</option>
+                    <option value="Cyber Security & Ethical Hacking">Cyber Security & Ethical Hacking</option>
+                  </optgroup>
+                  <optgroup label="Design, Creative & Media">
+                    <option value="Graphic Design & Visual Communication">Graphic Design & Visual Communication</option>
+                    <option value="UI/UX & Product Design">UI/UX & Product Design</option>
+                  </optgroup>
+                  <optgroup label="Business & Marketing">
+                    <option value="Digital Marketing & Growth Strategy">Digital Marketing & Growth Strategy</option>
+                    <option value="Content Strategy & Media Marketing">Content Strategy & Media Marketing</option>
+                  </optgroup>
                 </select>
               </div>
             </div>
@@ -365,7 +382,7 @@
         <div class="footer-brand">
           <div class="footer-logo-row">
             <img src="/Elevatifier-logo.png" alt="Elevatifier Logo">
-            <h3>Elevatifier Technologies</h3>
+            <h3>Elevatifier Private Limited</h3>
           </div>
           <p>
             Elevatifier is an ISO 9001:2015 certified ed-tech & innovation platform recognized by DPIIT and Startup India. Empowering students with industry-standard internships and tamper-proof digital credentials.
@@ -391,12 +408,12 @@
         <div class="footer-col">
           <h4><i class="fa-solid fa-layer-group" style="color: var(--text-gold);"></i> Tech Domains</h4>
           <ul class="footer-links">
-            <li><a href="/#certificateForm"><i class="fa-solid fa-code" style="font-size: 10px;"></i> Full Stack Web Dev</a></li>
-            <li><a href="/#certificateForm"><i class="fa-solid fa-brain" style="font-size: 10px;"></i> AI & Machine Learning</a></li>
-            <li><a href="/#certificateForm"><i class="fa-solid fa-chart-pie" style="font-size: 10px;"></i> Data Science Analytics</a></li>
-            <li><a href="/#certificateForm"><i class="fa-solid fa-shield-halved" style="font-size: 10px;"></i> Cyber Security</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-code" style="font-size: 10px;"></i> Frontend & Backend Dev</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-database" style="font-size: 10px;"></i> Database Engineering</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-palette" style="font-size: 10px;"></i> Graphic & UI/UX Design</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-bullhorn" style="font-size: 10px;"></i> Digital Marketing</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-brain" style="font-size: 10px;"></i> AI & Data Science</a></li>
             <li><a href="/#certificateForm"><i class="fa-solid fa-cloud" style="font-size: 10px;"></i> Cloud & DevOps</a></li>
-            <li><a href="/#certificateForm"><i class="fa-brands fa-android" style="font-size: 10px;"></i> Android App Dev</a></li>
           </ul>
         </div>
 
@@ -415,7 +432,7 @@
 
       <div class="footer-bottom">
         <div>
-          &copy; 2026 Elevatifier Technologies & Edutech Pvt. Ltd. All rights reserved.
+          &copy; 2026 Elevatifier Private Limited. All rights reserved.
         </div>
         <div class="footer-security-seals">
           <span><i class="fa-solid fa-lock"></i> 256-Bit SSL Encrypted</span>

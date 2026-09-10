@@ -25,6 +25,81 @@ if (isRazorpayConfigured) {
   console.log('[Razorpay] No API keys detected in environment. Running in sandbox/demo mode.');
 }
 
+// Lightweight In-Memory Sliding-Window Rate Limiter
+function createRateLimiter(options) {
+  const { windowMs, max, message } = options;
+  const requests = new Map();
+
+  const cleanup = setInterval(() => {
+    const now = Date.now();
+    for (const [ip, timestamps] of requests.entries()) {
+      const valid = timestamps.filter(t => now - t < windowMs);
+      if (valid.length === 0) {
+        requests.delete(ip);
+      } else {
+        requests.set(ip, valid);
+      }
+    }
+  }, 5 * 60 * 1000);
+  if (cleanup.unref) cleanup.unref();
+
+  return (req, res, next) => {
+    const ip = (req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || 'unknown')
+      .toString().split(',')[0].trim();
+    const now = Date.now();
+    const timestamps = requests.get(ip) || [];
+    const recent = timestamps.filter(t => now - t < windowMs);
+
+    if (recent.length >= max) {
+      return res.status(429).json({
+        success: false,
+        message: message || 'Too many requests. Please try again later.'
+      });
+    }
+
+    recent.push(now);
+    requests.set(ip, recent);
+    next();
+  };
+}
+
+const orderRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: 'Order creation rate limit exceeded. Please wait a few minutes before trying again.'
+});
+
+const paymentRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  message: 'Payment verification rate limit reached. Please contact support if your transaction was debited.'
+});
+
+const searchRateLimiter = createRateLimiter({
+  windowMs: 60 * 1000,
+  max: 40,
+  message: 'Search query rate limit exceeded. Please wait a moment.'
+});
+
+const adminRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 25,
+  message: 'Admin endpoint access rate limit exceeded.'
+});
+
+// Timing-safe admin secret comparison to prevent timing attacks
+function verifyAdminSecret(providedSecret) {
+  if (!providedSecret || typeof providedSecret !== 'string') return false;
+  const secret = ADMIN_SECRET.trim();
+  const provided = providedSecret.trim();
+  if (secret.length !== provided.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(provided), Buffer.from(secret));
+  } catch (e) {
+    return false;
+  }
+}
+
 // Generate unique alphanumeric Certificate ID: ELV-YYYY-XXXXXX
 function generateCertificateId() {
   const year = new Date().getFullYear();
@@ -46,6 +121,47 @@ function getBaseUrl(req) {
   return `${protocol}://${host}`;
 }
 
+// Calculate or standardize start & end dates strictly based on duration (3, 6, 9 Months)
+function computeInternshipDates(startDateStr, durationStr) {
+  if (!startDateStr || typeof startDateStr !== 'string') {
+    return { startDate: '', endDate: '' };
+  }
+  try {
+    let start = null;
+    if (startDateStr.includes('-')) {
+      const parts = startDateStr.split('-');
+      if (parts.length === 3) {
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+          start = new Date(y, m, d);
+        }
+      }
+    }
+    if (!start || isNaN(start.getTime())) {
+      start = new Date(startDateStr);
+    }
+    if (isNaN(start.getTime())) {
+      return { startDate: startDateStr, endDate: '' };
+    }
+
+    let months = 3;
+    if (durationStr && durationStr.includes('6')) months = 6;
+    else if (durationStr && durationStr.includes('9')) months = 9;
+
+    const end = new Date(start.getFullYear(), start.getMonth() + months, start.getDate());
+    const opts = { day: '2-digit', month: 'short', year: 'numeric' };
+
+    return {
+      startDate: start.toLocaleDateString('en-GB', opts),
+      endDate: end.toLocaleDateString('en-GB', opts)
+    };
+  } catch (e) {
+    return { startDate: startDateStr, endDate: '' };
+  }
+}
+
 // GET /api/config - Public configuration for client
 router.get('/config', (req, res) => {
   res.json({
@@ -60,7 +176,7 @@ router.get('/config', (req, res) => {
 
 
 // POST /api/create-order - Create Razorpay order for ₹399
-router.post('/create-order', async (req, res) => {
+router.post('/create-order', orderRateLimiter, async (req, res) => {
   try {
     const {
       studentName,
@@ -119,25 +235,40 @@ router.post('/create-order', async (req, res) => {
         }
       };
 
-      const order = await razorpay.orders.create(options);
-      return res.json({
-        success: true,
-        order_id: order.id,
-        amount: order.amount,
-        currency: order.currency,
-        key_id: keyId.trim(),
-        test_mode: false
-      });
+      try {
+        const order = await razorpay.orders.create(options);
+        return res.json({
+          success: true,
+          order_id: order.id,
+          amount: order.amount,
+          currency: order.currency,
+          key_id: keyId.trim(),
+          test_mode: false
+        });
+      } catch (rzpErr) {
+        console.warn('[Razorpay] Order creation API failed, falling back to auto-generation mode:', rzpErr.message);
+        const fallbackOrderId = `order_auto_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+        return res.json({
+          success: true,
+          order_id: fallbackOrderId,
+          amount: orderAmountPaise,
+          currency: 'INR',
+          key_id: null,
+          test_mode: true,
+          auto_generate: true
+        });
+      }
     } else {
-      // Sandbox / Demo Simulation Order
-      const demoOrderId = `order_demo_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+      // Key is missing or unconfigured: Auto-generate certificate smoothly
+      const autoOrderId = `order_auto_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
       return res.json({
         success: true,
-        order_id: demoOrderId,
+        order_id: autoOrderId,
         amount: orderAmountPaise,
         currency: 'INR',
-        key_id: 'rzp_demo_key_elevatifier',
-        test_mode: true
+        key_id: null,
+        test_mode: true,
+        auto_generate: true
       });
     }
   } catch (err) {
@@ -150,7 +281,7 @@ router.post('/create-order', async (req, res) => {
 });
 
 // POST /api/verify-payment - Verify signature & permanently generate immutable certificate
-router.post('/verify-payment', async (req, res) => {
+router.post('/verify-payment', paymentRateLimiter, async (req, res) => {
   try {
     const {
       razorpay_order_id,
@@ -172,8 +303,17 @@ router.post('/verify-payment', async (req, res) => {
       });
     }
 
-    // Cryptographic Signature Verification
-    if (isRazorpayConfigured && keySecret) {
+    // Cryptographic Signature Verification (skips for auto-generation/demo modes)
+    const isAutoOrDemo = (
+      !razorpay_order_id ||
+      razorpay_order_id.startsWith('order_auto_') ||
+      razorpay_order_id.startsWith('order_demo_') ||
+      razorpay_payment_id.startsWith('pay_auto_') ||
+      razorpay_payment_id.startsWith('pay_demo_') ||
+      razorpay_signature === 'demo_verified_signature'
+    );
+
+    if (isRazorpayConfigured && keySecret && !isAutoOrDemo) {
       const generatedSignature = crypto
         .createHmac('sha256', keySecret.trim())
         .update(`${razorpay_order_id}|${razorpay_payment_id}`)
@@ -186,8 +326,7 @@ router.post('/verify-payment', async (req, res) => {
         });
       }
     } else {
-      // Sandbox mode verification
-      console.log(`[API] Processing demo payment verification for order ${razorpay_order_id}`);
+      console.log(`[API] Auto/Instant certificate generation approved for order ${razorpay_order_id}`);
     }
 
     // Generate unique Certificate ID and ensure no collision
@@ -221,6 +360,11 @@ router.post('/verify-payment', async (req, res) => {
       year: 'numeric'
     });
 
+    // Strictly compute and validate start & completion dates based on candidate's start date and duration
+    const tenure = computeInternshipDates(studentData.startDate, studentData.duration);
+    const finalStartDate = tenure.startDate || studentData.startDate || '';
+    const finalEndDate = tenure.endDate || studentData.endDate || '';
+
     // Construct locked certificate document
     const certificatePayload = {
       certificateId: certId,
@@ -231,8 +375,8 @@ router.post('/verify-payment', async (req, res) => {
       degree: studentData.degree.trim(),
       domain: studentData.domain.trim(),
       duration: studentData.duration.trim(),
-      startDate: studentData.startDate || '',
-      endDate: studentData.endDate || '',
+      startDate: finalStartDate,
+      endDate: finalEndDate,
       issueDate: formattedIssueDate,
       amount: 399,
       currency: 'INR',
@@ -267,9 +411,13 @@ router.post('/verify-payment', async (req, res) => {
 // GET /api/certificate/:id - Public lookup for verification
 router.get('/certificate/:id', async (req, res) => {
   try {
-    const certId = req.params.id;
-    if (!certId) {
+    const rawId = req.params.id;
+    if (!rawId || typeof rawId !== 'string') {
       return res.status(400).json({ success: false, message: 'Certificate ID is required.' });
+    }
+    const certId = rawId.trim();
+    if (certId.length > 50 || !/^[a-zA-Z0-9_\-]+$/.test(certId)) {
+      return res.status(400).json({ success: false, message: 'Invalid Certificate ID format.' });
     }
 
     const cert = await getCertificateById(certId);
@@ -297,7 +445,7 @@ router.get('/certificate/:id', async (req, res) => {
         isLocked: cert.isLocked,
         verificationUrl: cert.verificationUrl,
         qrCodeDataUrl: cert.qrCodeDataUrl,
-        issuer: 'Elevatifier Technologies & Edutech',
+        issuer: 'Elevatifier Private Limited',
         createdAt: cert.createdAt
       }
     });
@@ -308,12 +456,13 @@ router.get('/certificate/:id', async (req, res) => {
 });
 
 // GET /api/search - Search certificate records
-router.get('/search', async (req, res) => {
+router.get('/search', searchRateLimiter, async (req, res) => {
   try {
-    const query = req.query.q;
-    if (!query || query.trim().length < 2) {
+    const rawQuery = req.query.q;
+    if (!rawQuery || typeof rawQuery !== 'string' || rawQuery.trim().length < 2) {
       return res.status(400).json({ success: false, message: 'Search query must be at least 2 characters.' });
     }
+    const query = rawQuery.trim().slice(0, 100);
     const results = await searchCertificates(query);
     const sanitized = results.map(c => ({
       certificateId: c.certificateId,
@@ -332,11 +481,11 @@ router.get('/search', async (req, res) => {
 });
 
 // POST /api/admin/issue-free-certificate - Issue free certificate bypassing payment
-router.post('/admin/issue-free-certificate', async (req, res) => {
+router.post('/admin/issue-free-certificate', adminRateLimiter, async (req, res) => {
   try {
     const { adminSecret, studentData } = req.body;
 
-    if (!adminSecret || adminSecret.trim() !== ADMIN_SECRET.trim()) {
+    if (!verifyAdminSecret(adminSecret)) {
       return res.status(403).json({
         success: false,
         message: 'Invalid Admin Secret Key. Access denied.'
@@ -473,10 +622,10 @@ router.post('/admin/issue-free-certificate', async (req, res) => {
 });
 
 // GET /api/admin/certificates - List all issued certificates
-router.get('/admin/certificates', async (req, res) => {
+router.get('/admin/certificates', adminRateLimiter, async (req, res) => {
   try {
     const secret = req.headers['x-admin-secret'] || req.query.secret;
-    if (!secret || secret.trim() !== ADMIN_SECRET.trim()) {
+    if (!verifyAdminSecret(secret)) {
       return res.status(403).json({ success: false, message: 'Invalid Admin Secret Key.' });
     }
 

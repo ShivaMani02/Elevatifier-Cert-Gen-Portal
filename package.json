@@ -14,7 +14,7 @@
     "internship",
     "verification"
   ],
-  "author": "Elevatifier Technologies",
+  "author": "Elevatifier Private Limited",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
