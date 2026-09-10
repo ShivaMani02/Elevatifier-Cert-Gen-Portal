@@ -1,0 +1,28 @@
+{
+  "name": "elevatifier-cert-gen-portal",
+  "version": "1.0.0",
+  "description": "Elevatifier Official Internship Certificate Generation & Verification Monolithic Platform",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "keywords": [
+    "elevatifier",
+    "certificate-generator",
+    "razorpay",
+    "internship",
+    "verification"
+  ],
+  "author": "Elevatifier Technologies",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "mongoose": "^8.9.2",
+    "qrcode": "^1.5.4",
+    "razorpay": "^2.9.5"
+  }
+}

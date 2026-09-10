@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: elevatifier-cert-portal
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: BASE_URL
+        value: https://certify.elevatifier.com
+      - key: MONGODB_URI
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: ADMIN_SECRET
+        value: elevatifier_admin_2026_SHIVANSH_Random
+      - key: SUPPORT_EMAIL
+        value: contact@elevatifier.com
+      - key: KEEP_ALIVE
+        value: true

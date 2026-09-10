@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elevatifier Admin | Certificate Control Panel</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/Elevatifier-logo.png">
+  <link rel="shortcut icon" type="image/png" href="/Elevatifier-logo.png">
+  <link rel="apple-touch-icon" href="/Elevatifier-logo.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .admin-auth-card {
+      max-width: 480px;
+      margin: 60px auto;
+      padding: 36px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-gold);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      text-align: center;
+    }
+    .admin-panel-container {
+      display: none;
+      max-width: 1200px;
+      margin: 0 auto 60px auto;
+    }
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .admin-stat-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .admin-stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      color: #cbd5e1;
+      margin-top: 16px;
+    }
+    .admin-table th {
+      text-align: left;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      color: #94a3b8;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .admin-table td {
+      padding: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .admin-table tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .badge-paid {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-free {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Navbar -->
+    <header class="navbar">
+      <a href="/" class="brand-logo">
+        <img src="/Elevatifier-logo.png" alt="Elevatifier Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>Elevatifier <span class="brand-tag" style="background: rgba(212, 175, 55, 0.15); color: var(--text-gold); border-color: var(--border-gold);">Admin Control</span></h1>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="mailto:contact@elevatifier.com" class="support-pill-link">
+          <i class="fa-solid fa-headset"></i> contact@elevatifier.com
+        </a>
+        <a href="/" class="nav-link"><i class="fa-solid fa-arrow-left"></i> Student Portal</a>
+        <a href="/verify" class="btn-nav-verify"><i class="fa-solid fa-shield-check"></i> Public Registry</a>
+      </nav>
+    </header>
+
+    <!-- Admin Login Screen -->
+    <div id="adminAuthSection" class="admin-auth-card">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(212, 175, 55, 0.15); color: var(--text-gold); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px auto;">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+      <h2 style="font-size: 22px; margin-bottom: 8px;">Elevatifier Admin Access</h2>
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 24px;">
+        Enter your administrative secret key to generate free certificates and manage the registry.
+      </p>
+
+      <form id="adminLoginForm">
+        <div class="form-group" style="text-align: left;">
+          <label for="adminSecretInput">Admin Secret Key</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-key input-icon"></i>
+            <input type="password" id="adminSecretInput" class="form-control" placeholder="Enter ADMIN_SECRET..." required>
+          </div>
+        </div>
+        <button type="submit" class="btn-checkout" style="width: 100%; margin-top: 10px;">
+          <i class="fa-solid fa-unlock"></i> Authenticate & Enter
+        </button>
+        <div id="authErrorMsg" style="color: #f87171; font-size: 12.5px; margin-top: 12px; display: none;"></div>
+      </form>
+    </div>
+
+    <!-- Authenticated Admin Dashboard -->
+    <div id="adminPanelSection" class="admin-panel-container">
+      
+      <!-- Stats Bar & System Status -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: gap; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+            <i class="fa-solid fa-database"></i> MongoDB Atlas Cloud Active
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); border: 1px solid rgba(56, 189, 248, 0.35); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+            <i class="fa-solid fa-lock"></i> Master Authorization Granted
+          </span>
+        </div>
+        <button id="btnAdminLogout" class="btn-secondary-action" style="padding: 6px 14px; font-size: 12px;">
+          <i class="fa-solid fa-right-from-bracket"></i> Lock Session
+        </button>
+      </div>
+
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon"><i class="fa-solid fa-certificate"></i></div>
+          <div>
+            <div style="font-size: 12px; color: var(--text-muted);">Total Certificates Issued</div>
+            <div id="statTotalCerts" style="font-size: 24px; font-weight: 800; color: #fff;">0</div>
+          </div>
+        </div>
+
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="color: #10b981; background: rgba(16, 185, 129, 0.15);"><i class="fa-solid fa-gift"></i></div>
+          <div>
+            <div style="font-size: 12px; color: var(--text-muted);">Free Admin Grants</div>
+            <div id="statFreeGrants" style="font-size: 24px; font-weight: 800; color: #34d399;">0</div>
+          </div>
+        </div>
+
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="color: var(--text-gold); background: rgba(212, 175, 55, 0.15);"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+          <div>
+            <div style="font-size: 12px; color: var(--text-muted);">Standard Student Orders</div>
+            <div id="statPaidOrders" style="font-size: 24px; font-weight: 800; color: var(--text-gold);">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Issue Free Certificate Section -->
+      <div class="glass-card" style="margin-bottom: 36px;">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fa-solid fa-circle-plus" style="color: #10b981;"></i> Issue 100% Free Verified Certificate
+          </div>
+          <span class="admin-badge-free">Admin Grant (₹0)</span>
+        </div>
+
+        <form id="adminFreeIssueForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="admStudentName">Student Full Name <span class="required-star">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-user input-icon"></i>
+                <input type="text" id="admStudentName" class="form-control" placeholder="e.g. Rahul Verma" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="admEmail">Student Email <span class="required-star">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-envelope input-icon"></i>
+                <input type="email" id="admEmail" class="form-control" placeholder="rahul@example.com" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="admMobile">Mobile / WhatsApp <span class="required-star">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-phone input-icon"></i>
+                <input type="tel" id="admMobile" class="form-control" placeholder="+91 9876543210" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="admCollege">College / Institute <span class="required-star">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-building-columns input-icon"></i>
+                <input type="text" id="admCollege" class="form-control" placeholder="e.g. IIT Kharagpur" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="admDegree">Degree / Branch <span class="required-star">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-graduation-cap input-icon"></i>
+                <input type="text" id="admDegree" class="form-control" placeholder="e.g. B.Tech Computer Science" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="admDomain">Internship Domain <span class="required-star">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-laptop-code input-icon"></i>
+                <select id="admDomain" class="form-control" required>
+                  <option value="Full Stack Web Development">Full Stack Web Development</option>
+                  <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence & Machine Learning</option>
+                  <option value="Data Science & Business Analytics">Data Science & Business Analytics</option>
+                  <option value="Cloud Computing & DevOps">Cloud Computing & DevOps</option>
+                  <option value="Cyber Security & Ethical Hacking">Cyber Security & Ethical Hacking</option>
+                  <option value="Mobile Application Development (Android/iOS)">Mobile Application Development (Android/iOS)</option>
+                  <option value="UI/UX & Product Design">UI/UX & Product Design</option>
+                  <option value="Python Programming & Software Engineering">Python Programming & Software Engineering</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="admDuration">Internship Duration <span class="required-star">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-clock input-icon"></i>
+                <select id="admDuration" class="form-control" required>
+                  <option value="3 Months" selected>3 Months (Standard)</option>
+                  <option value="6 Months">6 Months (Semester)</option>
+                  <option value="9 Months">9 Months (Advanced)</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="admIssueDate">Issue Date (Optional)</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-calendar-day input-icon"></i>
+                <input type="text" id="admIssueDate" class="form-control" placeholder="Auto (Today's Date)">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="btnAdminIssue" class="btn-checkout" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; margin-top: 10px;">
+            <i class="fa-solid fa-file-circle-check"></i> Issue Verified Certificate (Free ₹0)
+          </button>
+        </form>
+      </div>
+
+      <!-- Registry Table with Real-time Search -->
+      <div class="glass-card">
+        <div class="card-header" style="flex-wrap: wrap; gap: 14px;">
+          <div class="card-title">
+            <i class="fa-solid fa-list-check" style="color: var(--accent-cyan);"></i> Registry of Issued Certificates
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="input-wrapper" style="max-width: 280px;">
+              <i class="fa-solid fa-magnifying-glass input-icon"></i>
+              <input type="text" id="adminSearchInput" class="form-control" style="padding: 8px 12px 8px 36px; font-size: 12.5px;" placeholder="Search candidate, ID, domain...">
+            </div>
+            <button id="btnRefreshList" class="btn-secondary-action" style="padding: 8px 14px; font-size: 12px;">
+              <i class="fa-solid fa-arrows-rotate"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Certificate ID</th>
+                <th>Candidate Name</th>
+                <th>Domain</th>
+                <th>Duration</th>
+                <th>Type / Fee</th>
+                <th>Issue Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                  Loading certificates...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Hidden Canvas for Admin Certificate Rendering & Download -->
+    <div style="display: none;">
+      <canvas id="adminExportCanvas"></canvas>
+    </div>
+
+  </div>
+
+  <!-- Rich Corporate Multi-Column Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo-row">
+            <img src="/Elevatifier-logo.png" alt="Elevatifier Logo">
+            <h3>Elevatifier Technologies</h3>
+          </div>
+          <p>
+            Elevatifier is an ISO 9001:2015 certified ed-tech & innovation platform recognized by DPIIT and Startup India. Empowering students with industry-standard internships and tamper-proof digital credentials.
+          </p>
+          <div class="footer-accreditations">
+            <span class="footer-badge"><i class="fa-solid fa-shield-check"></i> DPIIT Recognized</span>
+            <span class="footer-badge"><i class="fa-solid fa-check"></i> Startup India</span>
+            <span class="footer-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4><i class="fa-solid fa-compass" style="color: var(--accent-cyan);"></i> Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="/"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> Issue Certificate</a></li>
+            <li><a href="/verify"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> Verify Credential</a></li>
+            <li><a href="/#recognitions"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> Partner Recognitions</a></li>
+            <li><a href="/#howItWorks"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> How It Works</a></li>
+            <li><a href="/#faqSection"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i> Help & FAQs</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4><i class="fa-solid fa-layer-group" style="color: var(--text-gold);"></i> Tech Domains</h4>
+          <ul class="footer-links">
+            <li><a href="/#certificateForm"><i class="fa-solid fa-code" style="font-size: 10px;"></i> Full Stack Web Dev</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-brain" style="font-size: 10px;"></i> AI & Machine Learning</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-chart-pie" style="font-size: 10px;"></i> Data Science Analytics</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-shield-halved" style="font-size: 10px;"></i> Cyber Security</a></li>
+            <li><a href="/#certificateForm"><i class="fa-solid fa-cloud" style="font-size: 10px;"></i> Cloud & DevOps</a></li>
+            <li><a href="/#certificateForm"><i class="fa-brands fa-android" style="font-size: 10px;"></i> Android App Dev</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4><i class="fa-solid fa-headset" style="color: #34d399;"></i> Official Helpdesk</h4>
+          <div class="footer-help-box">
+            <a href="mailto:contact@elevatifier.com" class="help-email"><i class="fa-solid fa-envelope"></i> contact@elevatifier.com</a>
+            <div class="help-note">24x7 Priority Support for Student Credentials & College Verification Enquiries.</div>
+          </div>
+          <div style="margin-top: 14px; font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+            <div><strong>Verification Portal:</strong> certify.elevatifier.com</div>
+            <div><strong>Database:</strong> MongoDB Atlas Persistent Cloud</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 Elevatifier Technologies & Edutech Pvt. Ltd. All rights reserved.
+        </div>
+        <div class="footer-security-seals">
+          <span><i class="fa-solid fa-lock"></i> 256-Bit SSL Encrypted</span>
+          <span><i class="fa-solid fa-database"></i> MongoDB Atlas Cloud</span>
+          <span><i class="fa-solid fa-bolt"></i> Instant Gallery Download</span>
+        </div>
+        <div class="footer-bottom-links">
+          <a href="/verify">Public Verification Registry</a>
+          <a href="mailto:contact@elevatifier.com">Support Helpdesk</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Certificate Canvas Engine -->
+  <script src="/js/certificate-renderer.js"></script>
+
+  <!-- Admin Controller -->
+  <script src="/js/admin.js"></script>
+
+</body>
+</html>
